@@ -16,16 +16,23 @@ const START_SERVER = () => {
 
   app.use(express.json())
 
-  const hostname = 'localhost'
-  const port = process.env.port
+  const hostname = process.env.LOCAL_APP_HOST
+  const port = process.env.LOCAL_APP_PORT
 
   app.use('/api', ClientRoute)
   app.use( errorHandlingMiddleware)
 
-  app.listen(port, hostname, () => {
-    // eslint-disable-next-line no-console
-    console.log(`I am running at: http://${ hostname }:${ port }/`)
-  })
+  if (process.env.BUILD_MODE === 'production' ) {
+    app.listen(process.env.PORT, () => {
+      // eslint-disable-next-line no-console
+      console.log(`Production. I am running at host :${ port }/`)
+    })
+  } else {
+    app.listen(port, hostname, () => {
+      // eslint-disable-next-line no-console
+      console.log(`I am running at: http://${ hostname }:${ port }/`)
+    })
+  }
 
 }
 
