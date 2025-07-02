@@ -2,6 +2,8 @@ import { StatusCodes } from 'http-status-codes'
 import { userService } from '~/services/userService'
 import crypto from 'crypto'
 import bcrypt from 'bcryptjs'
+import { calculateLifePathNumber } from '~/utils/caculateDob'
+import { numerologymodel } from '~/models/numerologyModel'
 
 //[PATCH]/user/kyc
 const requestKyc = async (req, res, next) => {
@@ -70,8 +72,25 @@ const resendOtp = async (req, res, next) => {
 
   } catch (error) { next(error) }
 }
+
+//[POST]/user/numerology
+const numerology = async (req, res, next) => {
+  try {
+    const { birth, name } = req.body
+    const number = calculateLifePathNumber(birth)
+    const meaning = await numerologymodel.getMeanings(number)
+    return res.status(StatusCodes.OK).json({
+      name,
+      number,
+      meaning
+    })
+
+  } catch (error) { next(error)}
+}
+
 export const userController = {
   requestKyc,
   verifyKyc,
-  resendOtp
+  resendOtp,
+  numerology
 }

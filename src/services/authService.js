@@ -26,7 +26,7 @@ const login = async (reqBody) => {
       { expiresIn:process.env.JWT_EXPIRES }
     )
     return {
-      ...user,
+      address,
       accessToken: token
     }
   } catch (error) { throw error }

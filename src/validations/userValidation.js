@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import Joi from 'joi'
 import ApiError from '~/utils/ApiError'
-import { ADRESS_RULE } from '~/utils/Validator'
+import { BIRTH_RULE } from '~/utils/Validator'
 const createUser =async (req, res, next ) => {
 
   const correctCodition = Joi.object({
@@ -76,10 +76,31 @@ const verifyKyc = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
   }
 }
+const numerology = async (req, res, next) => {
+  const correctCondition = Joi.object({
+    birth: Joi.string().required().pattern(BIRTH_RULE).trim().strict().messages({
+      'any.required': 'birth is required',
+      'string.empty': 'birth cannot be empty',
+      'string.pattern.base': 'birth is not valid'
+    }),
+    name:Joi.string().required().trim().strict().messages({
+      'any.required': 'name is required',
+      'string.empty': 'name cannot be empty'
 
+    })
+  }).strict()
+
+  try {
+    await correctCondition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) {
+    next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
+  }
+}
 export const userValidation = {
   createUser,
   login,
   requestkyc,
-  verifyKyc
+  verifyKyc,
+  numerology
 }

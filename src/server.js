@@ -7,6 +7,8 @@ import { ClientRoute } from './routes'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
 import cors from 'cors'
 import { corsOptions } from './config/cors'
+import { getSwaggerSpec, swaggerSpec } from './config/swagger'
+import swaggerUi from 'swagger-ui-express'
 dotenv.config()
 
 const START_SERVER = () => {
@@ -21,6 +23,7 @@ const START_SERVER = () => {
 
   app.use('/api', ClientRoute)
   app.use( errorHandlingMiddleware)
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getSwaggerSpec()))
 
   if (process.env.BUILD_MODE === 'production' ) {
     app.listen(process.env.PORT, () => {
