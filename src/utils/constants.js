@@ -1,5 +1,6 @@
 export const WHITELIST_DOMAINS = [
-  'http://localhost:3000'
+  'http://localhost:3000',
+  'https://backend-9x9.onrender.com'
 ]
 
 export const EMAIL_SUBJECT = 'Xác nhận KYC'
