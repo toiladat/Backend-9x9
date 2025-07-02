@@ -13,11 +13,9 @@ const requestKyc = async (req, res, next) => {
     if (emailUsedByUser) res.status(StatusCodes.BAD_REQUEST).json({
       message: 'Email is used by another user'
     })
-    const hashedNationalId = await bcrypt.hash(req.body.nationalId, 12)
     const data = {
       address: req.decoded.address,
       email: req.body.email,
-      nationalId: hashedNationalId,
       kycOtp: crypto.randomInt(100000, 999999).toString()
     }
     const isKyc = await userService.requestKyc(data)

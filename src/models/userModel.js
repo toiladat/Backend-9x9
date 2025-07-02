@@ -11,7 +11,6 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   kycOtp: Joi.string().length(6).trim().strict(),
   name:Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
-  nationalId: Joi.string().optional().length(10).trim().strict(),
   history: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
     .default([]),

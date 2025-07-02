@@ -46,10 +46,6 @@ const requestkyc = async (req, res, next) => {
     email: Joi.string().email().required().trim().strict().messages({
       'any.required': 'Email is required',
       'string.email': 'Email must be a valid email'
-    }),
-    nationalId: Joi.string().length(10).required().trim().strict().messages({
-      'any.required': 'nationalId is required',
-      'string.length': 'National ID must be exactly 10 characters'
     })
   })
 

@@ -10,7 +10,7 @@ Route.use(authMiddlewares.auth)
  * @swagger
  * /user/kyc:
  *   patch:
- *     summary: KYC qua Email và CCCD
+ *     summary: KYC qua Email
  *     tags:
  *       - USER
  *     requestBody:
@@ -21,14 +21,10 @@ Route.use(authMiddlewares.auth)
  *             type: object
  *             required:
  *               - email
- *               - nationalId
  *             properties:
  *               email:
  *                 type: string
  *                 example: "tdat9663@gmail.com"
- *               nationalId:
- *                 type: string
- *                 example: "0582960284"
  *     responses:
  *       200:
  *         description: Lưu tạm Email và CCCD và gửi mail thành công
