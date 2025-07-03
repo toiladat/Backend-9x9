@@ -56,17 +56,18 @@ const requestKyc = async (data) => {
   } catch (error) { throw error}
 }
 
-const verifyKyc = async (data) => {
+const verifyKyc = async (address) => {
   try {
-    const { address, kycOtp } = data
-    const user = await userModel.findUserByAddress(address)
-    if ( user ) {
-      return await userModel.findUserAndUpdate({
-        address,
-        isKyc: true
-      })
-    }
-    return null
+    return await userModel.findUserAndUpdate({
+      address,
+      isKyc:true
+    })
+  } catch (error) { throw error}
+}
+
+const getUsers = async (pagination) => {
+  try {
+    return await userModel.getUsers(pagination)
   } catch (error) { throw error}
 }
 
@@ -76,5 +77,6 @@ export const userService = {
   updateUserByAddress,
   checkExistEmail,
   verifyKyc,
-  requestKyc
+  requestKyc,
+  getUsers
 }

@@ -133,6 +133,67 @@ Route.route('/verify-kyc')
 Route.route('/resend-otp')
   .patch(userController.resendOtp)
 
+
+/**
+ * @swagger
+ * /user/ranking:
+ *   get:
+ *     summary: Lấy thông tin bảng xếp hạng điểm hạt thịnh vượng
+ *     tags:
+ *       - USER
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Số trang
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 15
+ *         description: Số lượng user mỗi trang
+ *     responses:
+ *       200:
+ *         description: Thông tin người dùng và phân trang
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       address:
+ *                         type: string
+ *                         example: "0xabc123..."
+ *                       score:
+ *                         type: integer
+ *                         example: 89
+ *                       name:
+ *                         type: string
+ *                         example: "Nguyen Van A"
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     totalItems:
+ *                       type: integer
+ *                       example: 100
+ *                     limit:
+ *                       type: integer
+ *                       example: 15
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     pageTotal:
+ *                       type: integer
+ *                       example: 10
+ *       500:
+ *         description: Lỗi server
+ */
 Route.route('/ranking')
-  .get(authMiddlewares.isKyc, paginationMiddleware)
+  .get(authMiddlewares.isKyc, paginationMiddleware, userController.getUsers)
 export const userRoute = Route

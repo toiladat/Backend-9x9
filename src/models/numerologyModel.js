@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
-const NUM_COLLECTION_NAME = 'numerologies';
+const NUM_COLLECTION_NAME = 'numerologies'
 const NUM_COLLECTION_SCHEMA = Joi.object({
   number: Joi.number().integer().min(1).max(22).required(),
   lifePath: Joi.string().trim().strict().required(),
@@ -12,7 +12,11 @@ const NUM_COLLECTION_SCHEMA = Joi.object({
 })
 
 const getMeanings = async (number) => {
-  return await GET_DB().collection(NUM_COLLECTION_NAME).findOne({ number })
+  return await GET_DB().collection(NUM_COLLECTION_NAME)
+    .findOne(
+      { number: parseInt(number) },
+      { projection: { _id: 0, number: 0 } }
+    )
 }
 
 export const numerologymodel = {

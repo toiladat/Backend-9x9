@@ -1,5 +1,5 @@
 export const paginationMiddleware = (req, res, next) => {
-  const { limit = 10, page = 1, skip, take } = { ...req.query, ...req.body }
+  const { limit = 15, page = 1, skip, take } = { ...req.query, ...req.body }
 
   const parsedLimit = parseInt(limit)
   const parsedPage = parseInt(page)

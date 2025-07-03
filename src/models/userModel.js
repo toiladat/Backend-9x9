@@ -10,6 +10,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   isKyc: Joi.boolean().default(false),
   name:Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
+  score:Joi.string().trim().strict().default('0'),
   history: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
     .default([]),
@@ -96,6 +97,28 @@ const findUserByEmail = async(email) => {
     })
   } catch (error) { new Error(error) }
 }
+const getUsers = async (pagination) => {
+  const { limit, page, skip } = pagination
+
+  const db = GET_DB().collection(USER_COLLECTION_NAME)
+  const totalItems = await db.countDocuments({ _destroy: false })
+  const users = await db.find({ _destroy: false })
+    .skip(skip)
+    .limit(limit)
+    .sort({ score: 1 })
+    .toArray()
+  const pageTotal = Math.ceil(totalItems / limit)
+  return {
+    users: users,
+    pagination: {
+      totalItems,
+      page,
+      limit,
+      pageTotal
+    }
+  }
+}
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -104,5 +127,6 @@ export const userModel = {
   getUser,
   findUserAndUpdate,
   findUserByAddress,
-  findUserByEmail
+  findUserByEmail,
+  getUsers
 }

@@ -42,7 +42,7 @@ const verifyKyc = async (req, res, next) => {
       })
     }
 
-    const verifiedUser = await userService.verifyKyc({ address, kycOtp })
+    const verifiedUser = await userService.verifyKyc(address)
     if (verifiedUser) {
       return res.status(StatusCodes.OK).json({
         message:'KYC successfully'
@@ -86,8 +86,17 @@ const resendOtp = async (req, res, next) => {
   }
 }
 
+
+//[GET]/user/ranking
+const getUsers = async (req, res, next) => {
+  try {
+    const result = await userService.getUsers(req.pagination)
+    return res.status(StatusCodes.OK).json(result)
+  } catch (error) { next(error) }
+}
 export const userController = {
   requestKyc,
   verifyKyc,
-  resendOtp
+  resendOtp,
+  getUsers
 }
