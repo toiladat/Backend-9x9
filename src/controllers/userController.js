@@ -42,7 +42,7 @@ const verifyKyc = async (req, res, next) => {
       })
     }
 
-    const verifiedUser = await userService.verifyKyc(address)
+    const verifiedUser = await userService.verifyKyc({ address, email: cachedData.email })
     if (verifiedUser) {
       return res.status(StatusCodes.OK).json({
         message:'KYC successfully'
