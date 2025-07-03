@@ -1,8 +1,6 @@
 import { StatusCodes } from 'http-status-codes'
 import { userService } from '~/services/userService'
 import crypto from 'crypto'
-import { calculateLifePathNumber } from '~/utils/caculateDob'
-import { numerologymodel } from '~/models/numerologyModel'
 import { otpCache } from '~/utils/otpCache'
 import sendVerificationEmail from '~/utils/mailer'
 import { EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
@@ -88,25 +86,8 @@ const resendOtp = async (req, res, next) => {
   }
 }
 
-
-//[POST]/user/numerology
-const numerology = async (req, res, next) => {
-  try {
-    const { birth, name } = req.body
-    const number = calculateLifePathNumber(birth)
-    const meaning = await numerologymodel.getMeanings(number)
-    return res.status(StatusCodes.OK).json({
-      name,
-      number,
-      meaning
-    })
-
-  } catch (error) { next(error)}
-}
-
 export const userController = {
   requestKyc,
   verifyKyc,
-  resendOtp,
-  numerology
+  resendOtp
 }

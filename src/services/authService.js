@@ -18,7 +18,7 @@ const login = async (reqBody) => {
       const createdUser= await userModel.createUser({ address })
       user = await userModel.findOneById(createdUser.insertedId)
     }
-
+    delete user._destroy
     // JWT token
     const token = jwt.sign(
       { address, isKyc: user.isKyc },
@@ -26,7 +26,7 @@ const login = async (reqBody) => {
       { expiresIn:process.env.JWT_EXPIRES }
     )
     return {
-      address,
+      user,
       accessToken: token
     }
   } catch (error) { throw error }

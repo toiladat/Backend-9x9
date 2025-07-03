@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { userController } from '~/controllers/userController'
 import { authMiddlewares } from '~/middlewares/authMiddlewares'
+import { paginationMiddleware } from '~/utils/pagination'
 import { userValidation } from '~/validations/userValidation'
 
 const Route = Router()
@@ -132,6 +133,6 @@ Route.route('/verify-kyc')
 Route.route('/resend-otp')
   .patch(userController.resendOtp)
 
-Route.route('/numerology')
-  .patch(authMiddlewares.isKyc, userValidation.numerology, userController.numerology)
+Route.route('/ranking')
+  .get(authMiddlewares.isKyc, paginationMiddleware)
 export const userRoute = Route

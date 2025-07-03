@@ -1,0 +1,22 @@
+const { StatusCodes } = require('http-status-codes')
+const { numerologymodel } = require('~/models/numerologyModel')
+const { calculateLifePathNumber } = require('~/utils/caculateDob')
+
+//[POST]/numerology/numerology
+const numerology = async (req, res, next) => {
+  try {
+    const { birth, name } = req.body
+    const number = calculateLifePathNumber(birth)
+    const meaning = await numerologymodel.getMeanings(number)
+    return res.status(StatusCodes.OK).json({
+      name,
+      number,
+      meaning
+    })
+
+  } catch (error) { next(error)}
+}
+
+export const numerologyController = {
+  numerology
+}
