@@ -12,19 +12,25 @@ const auth = (req, res, next) => {
       message: 'Token is not valid or empty'
     })
   }
-
   const token = authHeader.split(' ')[1]
-
   try {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     req.decoded=decoded
-    next()
+    return next()
   } catch (err) {
     next(err)
   }
 }
-
+const isKyc = (req, res, next) => {
+  if (req.decoded.isKyc) {
+    return next()
+  }
+  return res.status(StatusCodes.FORBIDDEN).json({
+    message: 'Please KYC before take action'
+  })
+}
 export const authMiddlewares = {
-  auth
+  auth,
+  isKyc
 }

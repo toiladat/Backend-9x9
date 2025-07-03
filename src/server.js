@@ -7,7 +7,7 @@ import { ClientRoute } from './routes'
 import { errorHandlingMiddleware } from './middlewares/errorHandlingMiddleware'
 import cors from 'cors'
 import { corsOptions } from './config/cors'
-import { getSwaggerSpec, swaggerSpec } from './config/swagger'
+import { getSwaggerSpec } from './config/swagger'
 import swaggerUi from 'swagger-ui-express'
 dotenv.config()
 

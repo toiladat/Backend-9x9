@@ -50,7 +50,7 @@ Route.use(authMiddlewares.auth)
  *         description: Lỗi server
  */
 Route.route('/kyc')
-  .patch(authMiddlewares.auth, userValidation.requestkyc, userController.requestKyc)
+  .patch(userValidation.requestkyc, userController.requestKyc)
 
 /**
  * @swagger
@@ -96,8 +96,7 @@ Route.route('/kyc')
  *         description: Lỗi server
  */
 Route.route('/verify-kyc')
-  .patch(authMiddlewares.auth, userValidation.verifyKyc, userController.verifyKyc)
-
+  .patch(userValidation.verifyKyc, userController.verifyKyc)
 
 /**
  * @swagger
@@ -131,8 +130,8 @@ Route.route('/verify-kyc')
  *         description: Lỗi server
  */
 Route.route('/resend-otp')
-  .patch(authMiddlewares.auth, userController.resendOtp)
+  .patch(userController.resendOtp)
 
 Route.route('/numerology')
-  .patch(userValidation.numerology, userController.numerology)
+  .patch(authMiddlewares.isKyc, userValidation.numerology, userController.numerology)
 export const userRoute = Route

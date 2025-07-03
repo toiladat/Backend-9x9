@@ -60,7 +60,7 @@ const verifyKyc = async (data) => {
   try {
     const { address, kycOtp } = data
     const user = await userModel.findUserByAddress(address)
-    if ( user && user.kycOtp === kycOtp) {
+    if ( user ) {
       return await userModel.findUserAndUpdate({
         address,
         isKyc: true

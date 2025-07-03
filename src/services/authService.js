@@ -21,7 +21,7 @@ const login = async (reqBody) => {
 
     // JWT token
     const token = jwt.sign(
-      { address },
+      { address, isKyc: user.isKyc },
       process.env.JWT_SECRET,
       { expiresIn:process.env.JWT_EXPIRES }
     )

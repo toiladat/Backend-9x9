@@ -1,31 +1,32 @@
 import { StatusCodes } from 'http-status-codes'
 import { userService } from '~/services/userService'
 import crypto from 'crypto'
-import bcrypt from 'bcryptjs'
 import { calculateLifePathNumber } from '~/utils/caculateDob'
 import { numerologymodel } from '~/models/numerologyModel'
+import { otpCache } from '~/utils/otpCache'
+import sendVerificationEmail from '~/utils/mailer'
+import { EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
 
 //[PATCH]/user/kyc
 const requestKyc = async (req, res, next) => {
   try {
     //Check unique email
     const emailUsedByUser = await userService.checkExistEmail(req.body.email)
-    if (emailUsedByUser) res.status(StatusCodes.BAD_REQUEST).json({
+    if (emailUsedByUser) return res.status(StatusCodes.BAD_REQUEST).json({
       message: 'Email is used by another user'
     })
     const data = {
-      address: req.decoded.address,
       email: req.body.email,
       kycOtp: crypto.randomInt(100000, 999999).toString()
     }
-    const isKyc = await userService.requestKyc(data)
-    if ( isKyc) {
-      return res.status(StatusCodes.OK).json({
-        message: 'OTP sent, please check your mailbox'
-      })
-    }
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      message: 'Action again'
+    otpCache.set(req.decoded.address, data)
+    await sendVerificationEmail(
+      data.email,
+      EMAIL_SUBJECT,
+      EMAIL_HTML(data.kycOtp)
+    )
+    return res.status(StatusCodes.OK).json({
+      message: 'OTP sent, please check your mailbox'
     })
 
   } catch (error) { next(error)}
@@ -36,6 +37,13 @@ const verifyKyc = async (req, res, next) => {
   try {
     const address = req.decoded.address
     const kycOtp = req.body.kycOtp
+    const cachedData = otpCache.get(address)
+    if (!cachedData || !cachedData.email || String(cachedData.kycOtp) != String(kycOtp)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: 'No OTP data found, please start KYC process again.'
+      })
+    }
+
     const verifiedUser = await userService.verifyKyc({ address, kycOtp })
     if (verifiedUser) {
       return res.status(StatusCodes.OK).json({
@@ -53,23 +61,33 @@ const verifyKyc = async (req, res, next) => {
 const resendOtp = async (req, res, next) => {
   try {
     const address = req.decoded.address
-    const data = {
-      address,
-      kycOtp: crypto.randomInt(100000, 999999).toString()
-    }
+    const cachedData = otpCache.get(address)
 
-    const isKyc = await userService.requestKyc(data)
-    if ( isKyc) {
-      return res.status(StatusCodes.OK).json({
-        message: 'OTP sent, please check your mailbox'
+    if (!cachedData || !cachedData.email) {
+      return res.status(StatusCodes.BAD_REQUEST).json({
+        message: 'No OTP data found, please start KYC process again.'
       })
     }
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      message: 'Action again'
-    })
+    const newOtp = crypto.randomInt(100000, 999999).toString()
+    const newData = {
+      email: cachedData.email,
+      kycOtp: newOtp
+    }
+    otpCache.set(address, newData)
+    await sendVerificationEmail(
+      newData.email,
+      EMAIL_SUBJECT,
+      EMAIL_HTML(newOtp)
+    )
 
-  } catch (error) { next(error) }
+    return res.status(StatusCodes.OK).json({
+      message: 'OTP re-sent, please check your mailbox'
+    })
+  } catch (error) {
+    next(error)
+  }
 }
+
 
 //[POST]/user/numerology
 const numerology = async (req, res, next) => {
