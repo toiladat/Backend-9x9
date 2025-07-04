@@ -97,15 +97,18 @@ const findUserByEmail = async(email) => {
     })
   } catch (error) { new Error(error) }
 }
-const getUsers = async (pagination) => {
+const getUsers = async (pagination, filter, options ) => {
   const { limit, page, skip } = pagination
 
   const db = GET_DB().collection(USER_COLLECTION_NAME)
   const totalItems = await db.countDocuments({ _destroy: false })
-  const users = await db.find({ _destroy: false })
+  const users = await db.find(
+    filter,
+    options
+  )
     .skip(skip)
     .limit(limit)
-    .sort({ score: 1 })
+    .sort({ score: -1 })
     .toArray()
   const pageTotal = Math.ceil(totalItems / limit)
   return {

@@ -73,9 +73,9 @@ const verifyKyc = async (data) => {
   } catch (error) { throw error}
 }
 
-const getUsers = async (pagination) => {
+const getUsers = async (pagination, filter, options) => {
   try {
-    return await userModel.getUsers(pagination)
+    return await userModel.getUsers(pagination, filter, options)
   } catch (error) { throw error}
 }
 
