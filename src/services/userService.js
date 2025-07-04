@@ -5,6 +5,7 @@ import ApiError from '~/utils/ApiError'
 import { EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
 import slugify from '~/utils/formatters'
 import sendVerificationEmail from '~/utils/mailer'
+import jwt from 'jsonwebtoken'
 
 const createNew = async (reqBody) => {
   try {
@@ -56,12 +57,19 @@ const requestKyc = async (data) => {
   } catch (error) { throw error}
 }
 
-const verifyKyc = async (address) => {
+const verifyKyc = async (data) => {
   try {
-    return await userModel.findUserAndUpdate({
-      address,
+    const accessToken = jwt.sign(
+      { address: data.address, isKyc: true },
+      process.env.JWT_SECRET,
+      { expiresIn:process.env.JWT_EXPIRES }
+    )
+    const user = await userModel.findUserAndUpdate({
+      address: data.address,
+      email:data.email,
       isKyc:true
     })
+    return { accessToken, user }
   } catch (error) { throw error}
 }
 

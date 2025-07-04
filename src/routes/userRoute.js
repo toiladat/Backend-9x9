@@ -74,15 +74,15 @@ Route.route('/kyc')
  *                 example: "930482"
  *     responses:
  *       200:
- *         description: KYC thành công, trả về message
+ *         description: KYC thành công, trả về accessToken
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message:
+ *                 accessToken:
  *                   type: string
- *                   example: "KYC successfully"
+ *                   example: "eyJhbGciOiJIUzI1N"
  *       400:
  *         description: Lỗi do sai OTP..
  *         content:
@@ -132,7 +132,6 @@ Route.route('/verify-kyc')
  */
 Route.route('/resend-otp')
   .patch(userController.resendOtp)
-
 
 /**
  * @swagger
