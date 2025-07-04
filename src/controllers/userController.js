@@ -44,9 +44,7 @@ const verifyKyc = async (req, res, next) => {
 
     const result = await userService.verifyKyc({ address, email: cachedData.email })
     if (result.user) {
-      return res.status(StatusCodes.OK).json({
-        accessToken:result.accessToken
-      })
+      return res.status(StatusCodes.OK).json(result)
     }
     return res.status(StatusCodes.BAD_REQUEST).json({
       message:'KYC failed'
