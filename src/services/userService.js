@@ -23,7 +23,7 @@ const getUser = async (address) => {
 
     const userInfor = await userModel.getUser(address)
     if (!userInfor) {
-      throw ApiError(StatusCodes.NOT_FOUND, 'User not found')
+      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
     }
     return userInfor
   } catch (error) { throw error }

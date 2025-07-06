@@ -4,6 +4,7 @@ import crypto from 'crypto'
 import { otpCache } from '~/utils/otpCache'
 import sendVerificationEmail from '~/utils/mailer'
 import { EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
+import { userModel } from '~/models/userModel'
 
 //[PATCH]/user/kyc
 const requestKyc = async (req, res, next) => {
@@ -12,6 +13,10 @@ const requestKyc = async (req, res, next) => {
     const emailUsedByUser = await userService.checkExistEmail(req.body.email)
     if (emailUsedByUser) return res.status(StatusCodes.BAD_REQUEST).json({
       message: 'Email is used by another user'
+    })
+    const user = await userModel.findUserByAddress(req.decoded.address)
+    if (user && user.email) return res.status(StatusCodes.FORBIDDEN).json({
+      message: 'Account was KYC'
     })
     const data = {
       email: req.body.email,
@@ -75,7 +80,6 @@ const resendOtp = async (req, res, next) => {
       EMAIL_SUBJECT,
       EMAIL_HTML(newOtp)
     )
-
     return res.status(StatusCodes.OK).json({
       message: 'OTP re-sent, please check your mailbox'
     })

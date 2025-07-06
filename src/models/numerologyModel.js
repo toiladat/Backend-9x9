@@ -1,14 +1,18 @@
 import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
 const NUM_COLLECTION_NAME = 'numerologies'
+const OBJECT_CONTENT = Joi.object({
+  title:Joi.string().strict(),
+  content: Joi.string().strict()
+})
 const NUM_COLLECTION_SCHEMA = Joi.object({
   number: Joi.number().integer().min(1).max(22).required(),
-  lifePath: Joi.string().trim().strict().required(),
-  destiny: Joi.string().trim().strict().required(),
-  body: Joi.string().trim().strict().required(),
-  personality: Joi.string().trim().strict().required(),
-  soul: Joi.string().trim().strict().required(),
-  description: Joi.string().trim().strict().required()
+  description:Joi.string().required().trim().strict(),
+  lifePath: Joi.array().items(OBJECT_CONTENT).default([]),
+  destiny: Joi.array().items(OBJECT_CONTENT).default([]),
+  body: Joi.array().items(OBJECT_CONTENT).default([]),
+  personality: Joi.array().items(OBJECT_CONTENT).default([]),
+  soul: Joi.array().items(OBJECT_CONTENT).default([])
 })
 
 const getMeanings = async (number) => {
