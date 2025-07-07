@@ -98,4 +98,66 @@ Route.route('/nonce/:address')
 Route.route('/login')
   .post( userValidation.login, authController.login)
 
+
+/**
+ * @swagger
+ * /auth/refresh-token:
+ *   post:
+ *     summary: Refresh access token using refresh token
+ *     description: |
+ *       - Dùng refresh token (từ cookie hoặc body) để lấy access token mới
+ *       - Refresh token phải còn hiệu lực và hợp lệ trong database
+ *     tags:
+ *       - Auth
+ *     parameters:
+ *       - in: cookie
+ *         name: refreshToken
+ *         schema:
+ *           type: string
+ *         required: false
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: |
+ *                   - Chỉ cần thiết nếu không dùng cookie
+ *                   - Ưu tiên sử dụng HTTP-only cookie để bảo mật
+ *                 example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *     responses:
+ *       200:
+ *         description: Trả về access token mới
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: Access token mới (hết hạn sau 15 phút)
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *       401:
+ *         description: |
+ *           - Refresh token hết hạn/không hợp lệ
+ *           - Yêu cầu đăng nhập lại
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: string
+ *                   example: "REFRESH_TOKEN_EXPIRED"
+ *                 message:
+ *                   type: string
+ *                   example: "Phiên đăng nhập hết hạn"
+ *       500:
+ *         description: Lỗi server
+ */
+Route.route('/refresh-token')
+  .post(authController.refreshToken)
 export const authRoute = Route

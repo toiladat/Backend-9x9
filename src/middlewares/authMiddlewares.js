@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
-import jwt from 'jsonwebtoken'
+import { jwtUtils } from '~/utils/jwt'
 
-const auth = (req, res, next) => {
+const auth =async (req, res, next) => {
   // const whiteLists = ['/', '/auth', '/']
   // if (whiteLists.some(item => `/api${item}` === req.originalUrl)) {
   //   return next()
@@ -15,7 +15,10 @@ const auth = (req, res, next) => {
   const token = authHeader.split(' ')[1]
   try {
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = await jwtUtils.verifyToken(
+      token,
+      process.env.ACCESS_TOKEN_SECRET
+    )
     req.decoded=decoded
     return next()
   } catch (err) {

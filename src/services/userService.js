@@ -6,6 +6,7 @@ import { EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
 import slugify from '~/utils/formatters'
 import sendVerificationEmail from '~/utils/mailer'
 import jwt from 'jsonwebtoken'
+import { jwtUtils } from '~/utils/jwt'
 
 const createNew = async (reqBody) => {
   try {
@@ -59,17 +60,32 @@ const requestKyc = async (data) => {
 
 const verifyKyc = async (data) => {
   try {
-    const accessToken = jwt.sign(
-      { address: data.address, isKyc: true },
-      process.env.JWT_SECRET,
-      { expiresIn:process.env.JWT_EXPIRES }
+
+    // Prepare token payload
+    const tokenPayload = {
+      address: data.address,
+      isKyc: true
+    }
+    // Generate tokens
+    const accessToken = await jwtUtils.generateToken(
+      tokenPayload,
+      process.env.ACCESS_TOKEN_SECRET,
+      process.env.ACCESS_TOKEN_LIFE || '15m'
     )
+
+    const refreshToken = await jwtUtils.generateToken(
+      { address: data.address },
+      process.env.REFRESH_TOKEN_SECRET,
+      process.env.REFRESH_TOKEN_LIFE || '7d'
+    )
+
     const user = await userModel.findUserAndUpdate({
       address: data.address,
       email:data.email,
-      isKyc:true
+      isKyc:true,
+      refreshToken
     })
-    return { accessToken, user }
+    return { accessToken, refreshToken, user }
   } catch (error) { throw error}
 }
 

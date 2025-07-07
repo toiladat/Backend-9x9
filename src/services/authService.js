@@ -2,36 +2,118 @@ import { ethers } from 'ethers'
 import { StatusCodes } from 'http-status-codes'
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
-import jwt from 'jsonwebtoken'
+import { jwtUtils } from '~/utils/jwt'
+import crypto from 'crypto'
 
+const generateNonce = () => {
+  return crypto.randomBytes(16).toString('hex')
+}
 const login = async (reqBody) => {
   const { address, signature, message } = reqBody
   try {
-
     // Verify signature
     const recoveredAddress = ethers.verifyMessage(message, signature)
-    if ( recoveredAddress.toLowerCase() !== address.toLowerCase()) throw new ApiError(StatusCodes.UNAUTHORIZED, 'Signature do not match message')
+    if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Signature does not match message')
+    }
 
-    // Check exist user
+    // Check exist user and update nonce
     let user = await userModel.findUserByAddress(address)
-    if (! user) {
-      const createdUser= await userModel.createUser({ address })
+
+    if (!user) {
+      const createdUser = await userModel.createUser({
+        address,
+        nonce: generateNonce(), // Generate new nonce for new user
+        refreshToken: null // Initialize
+      })
+
       user = await userModel.findOneById(createdUser.insertedId)
+    } else {
+      // Existing user - verify nonce
+      if (user.nonce !== message) {
+        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid nonce')
+      }
+      // Update nonce after each login for security
+      await userModel.findUserAndUpdate({
+        address,
+        nonce: generateNonce()
+      })
     }
-    delete user._destroy
-    // JWT token
-    const token = jwt.sign(
-      { address, isKyc: user.isKyc },
-      process.env.JWT_SECRET,
-      { expiresIn:process.env.JWT_EXPIRES }
+
+    // Prepare token payload
+    const tokenPayload = {
+      address: user.address,
+      isKyc: user.isKyc || false
+    }
+
+    // Generate tokens
+    const accessToken = await jwtUtils.generateToken(
+      tokenPayload,
+      process.env.ACCESS_TOKEN_SECRET,
+      process.env.ACCESS_TOKEN_LIFE || '15m'
     )
+
+    const refreshToken = await jwtUtils.generateToken(
+      { address },
+      process.env.REFRESH_TOKEN_SECRET,
+      process.env.REFRESH_TOKEN_LIFE || '7d'
+    )
+
+    // Lưu refresh token vào database để có thể revoke sau này
+    await userModel.findUserAndUpdate({
+      address:user.address,
+      refreshToken
+    })
+
     return {
-      user,
-      accessToken: token
+      user: {
+        _id: user._id,
+        address: user.address,
+        isKyc: user.isKyc,
+        nonce: user.nonce // Client cần nonce mới cho lần login tiếp theo
+      },
+      accessToken,
+      refreshToken
     }
-  } catch (error) { throw error }
+  } catch (error) {
+    throw error
+  }
 }
 
+const refreshAccessToken = async (refreshToken) => {
+  try {
+    // Verify refresh token
+    const decoded = await jwtUtils.verifyToken(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    )
+
+    // Check if token exists in DB (prevent reuse)
+    const user = await userModel.findOneById(decoded.userId)
+    if (!user || !user.refreshToken !==refreshToken) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token')
+    }
+
+    // Generate new access token
+    const newAccessToken = await jwtUtils.generateToken(
+      {
+        userId: user._id,
+        address: user.address,
+        isKyc: user.isKyc
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      process.env.ACCESS_TOKEN_LIFE || '15m'
+    )
+
+    return { accessToken: newAccessToken }
+  } catch (error) {
+    throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token invalid or expired')
+  }
+}
+
+
 export const authService = {
-  login
+  login,
+  refreshAccessToken,
+  generateNonce
 }

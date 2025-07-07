@@ -7,6 +7,7 @@ const USER_COLLECTION_NAME = 'users'
 
 const USER_COLLECTION_SCHEMA = Joi.object({
   address: Joi.string().pattern(ADRESS_RULE).required().trim().strict(),
+  nonce: Joi.string().length(32).hex().required(),
   isKyc: Joi.boolean().default(false),
   name:Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
@@ -16,7 +17,8 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     .default([]),
   createdAt: Joi.date().timestamp('javascript').default(Date.now()),
   updatedAt: Joi.date().timestamp('javascript').default(null),
-  _destroy:Joi.boolean().default(false)
+  _destroy:Joi.boolean().default(false),
+  refreshToken: Joi.string().allow(null).empty('').default(null)
 })
 
 const validateBeforeCreate = async (data) => {
@@ -31,8 +33,8 @@ const validateBeforeCreate = async (data) => {
 const createUser = async (data) => {
   try {
     const validUser = await validateBeforeCreate(data)
-
     const createdNew= await GET_DB().collection(USER_COLLECTION_NAME).insertOne(validUser)
+
     return createdNew
   }
   catch (err) { new Error(err) }
@@ -67,13 +69,12 @@ const findUserAndUpdate = async( data) => {
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
       {
-        address: data.address,
-        _destroy:false
+        address: data.address
       },
       { $set: { ...data, updatedAt: new Date() } },
       {
         returnDocument: 'after',
-        projection: { _destroy: 0 }
+        projection: { address: 1, email: 1, score: 1, history:1 }
       }
     )
     return result
