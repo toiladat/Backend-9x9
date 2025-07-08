@@ -50,13 +50,6 @@ const verifyKyc = async (req, res, next) => {
     const result = await userService.verifyKyc({ address, email: cachedData.email })
     otpCache.del(address)
     if (result.user) {
-      // Trong controller
-      res.cookie('accessToken9x9', result.accessToken, {
-        httpOnly: true, // ✅ Không cho JS truy cập (bảo mật hơn)
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 15 * 60 * 1000 // 15 phút chẳng hạn
-      })
       return res.status(StatusCodes.OK).json(result)
     }
     return res.status(StatusCodes.BAD_REQUEST).json({

@@ -27,17 +27,11 @@ const login = async (req, res, next) => {
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     })
-    res.cookie('accessToken9x9', result.accessToken, {
-      httpOnly: true, // ✅ Không cho JS truy cập (bảo mật hơn)
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000 // 15 phút chẳng hạn
-    })
-
 
     // Trả về thông tin user và access token (không trả về refresh token)
     res.status(StatusCodes.OK).json({
-      user: result.user
+      user: result.user,
+      accessToken: result.accessToken
     })
   } catch (error) {next(error) }
 }
