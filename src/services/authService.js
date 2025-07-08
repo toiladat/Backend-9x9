@@ -34,7 +34,7 @@ const login = async (reqBody) => {
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid nonce')
       }
       // Update nonce after each login for security
-      await userModel.findUserAndUpdate({
+      await userModel.updateUserByAdderss({
         address,
         nonce: generateNonce()
       })
@@ -60,7 +60,7 @@ const login = async (reqBody) => {
     )
 
     // Lưu refresh token vào database để có thể revoke sau này
-    await userModel.findUserAndUpdate({
+    await userModel.updateUserByAdderss({
       address:user.address,
       refreshToken
     })

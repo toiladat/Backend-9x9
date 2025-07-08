@@ -93,10 +93,32 @@ const numerology = async (req, res, next) => {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))
   }
 }
+
+const minningGold = async (req, res, next) => {
+  const correctCodition = Joi.object({
+    sessionId : Joi.string().required().guid({ version: ['uuidv4'] }).messages({
+      'any.required': 'sessionId is requried',
+      'string.guid':'sessionId must be a valid UUID4',
+      'string.empty':'sessionId can not be empty'
+    }),
+    score: Joi.number().integer().min(0).max(40).required().messages({
+      'any.required': 'score is required',
+      'number.base': 'score must be a number',
+      'number.integer': 'score must be an integer',
+      'number.min': 'score cannot be negative',
+      'number.max': 'score too high, possible cheating'
+    })
+  }).strict()
+  try {
+    await correctCodition.validateAsync(req.body, { abortEarly: false })
+    next()
+  } catch (error) { next(error)}
+}
 export const userValidation = {
   createUser,
   login,
   requestkyc,
   verifyKyc,
-  numerology
+  numerology,
+  minningGold
 }

@@ -11,7 +11,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   isKyc: Joi.boolean().default(false),
   name:Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
-  score:Joi.string().trim().strict().default('0'),
+  score: Joi.number().min(0).default(0),
   history: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
     .default([]),
@@ -26,7 +26,7 @@ const validateBeforeCreate = async (data) => {
     return await USER_COLLECTION_SCHEMA.validateAsync(data, { abortEarly:false })
 
   } catch (error) {
-    throw Error( error )
+    throw new Error( error )
   }
 }
 
@@ -40,7 +40,6 @@ const createUser = async (data) => {
   catch (err) { new Error(err) }
 }
 
-
 const findOneById = async(id) => {
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOne({
@@ -50,7 +49,6 @@ const findOneById = async(id) => {
     return result
   } catch (error) { new Error(error)}
 }
-
 
 const getUser = async(id) => {
   try {
@@ -65,21 +63,6 @@ const getUser = async(id) => {
   } catch (error) { new Error(error)}
 }
 
-const findUserAndUpdate = async( data) => {
-  try {
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
-      {
-        address: data.address
-      },
-      { $set: { ...data, updatedAt: new Date() } },
-      {
-        returnDocument: 'after',
-        projection: { address: 1, email: 1, score: 1, history:1 }
-      }
-    )
-    return result
-  } catch (error) { new Error(error)}
-}
 
 const findUserByAddress = async (address) => {
   try {
@@ -99,29 +82,51 @@ const findUserByEmail = async(email) => {
   } catch (error) { new Error(error) }
 }
 const getUsers = async (pagination, filter, options ) => {
-  const { limit, page, skip } = pagination
+  try {
+    const { limit, page, skip } = pagination
 
-  const db = GET_DB().collection(USER_COLLECTION_NAME)
-  const totalItems = await db.countDocuments({ _destroy: false })
-  const users = await db.find(
-    filter,
-    options
-  )
-    .skip(skip)
-    .limit(limit)
-    .sort({ score: -1 })
-    .toArray()
-  const pageTotal = Math.ceil(totalItems / limit)
-  return {
-    users: users,
-    pagination: {
-      totalItems,
-      page,
-      limit,
-      pageTotal
+    const db = GET_DB().collection(USER_COLLECTION_NAME)
+    const totalItems = await db.countDocuments({ _destroy: false })
+    const users = await db.find(
+      filter,
+      options
+    )
+      .skip(skip)
+      .limit(limit)
+      .sort({ score: -1 })
+      .toArray()
+    const pageTotal = Math.ceil(totalItems / limit)
+    return {
+      users: users,
+      pagination: {
+        totalItems,
+        page,
+        limit,
+        pageTotal
+      }
     }
-  }
+  } catch (error) { throw new Error(error)}
 }
+
+
+const updateUserByAdderss = async(data, options = { updateTimestamp: false }) => {
+
+  try {
+    const updatedData = { ...data }
+    if (options.updateTimestamp)
+      updatedData.updatedAt = new Date()
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
+      { address: data.address },
+      { $set: updatedData },
+      {
+        returnDocument: 'after',
+        projection: { address: 1, email: 1, score: 1, history: 1 }
+      }
+    )
+    return result
+  } catch (error) { throw new Error(error) }
+}
+
 
 export const userModel = {
   USER_COLLECTION_NAME,
@@ -129,8 +134,8 @@ export const userModel = {
   createUser,
   findOneById,
   getUser,
-  findUserAndUpdate,
   findUserByAddress,
   findUserByEmail,
-  getUsers
+  getUsers,
+  updateUserByAdderss
 }

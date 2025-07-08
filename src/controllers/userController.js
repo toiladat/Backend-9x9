@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { userService } from '~/services/userService'
 import crypto from 'crypto'
-import { otpCache } from '~/utils/otpCache'
+import { otpCache } from '~/utils/cache'
 import sendVerificationEmail from '~/utils/mailer'
 import { EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
 import { userModel } from '~/models/userModel'
@@ -48,6 +48,7 @@ const verifyKyc = async (req, res, next) => {
     }
 
     const result = await userService.verifyKyc({ address, email: cachedData.email })
+    otpCache.del(address)
     if (result.user) {
       // Trong controller
       res.cookie('refreshToken', result.refreshToken, {

@@ -1,11 +1,8 @@
 /* eslint-disable no-useless-catch */
-import { StatusCodes } from 'http-status-codes'
 import { userModel } from '~/models/userModel'
-import ApiError from '~/utils/ApiError'
 import { EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
 import slugify from '~/utils/formatters'
 import sendVerificationEmail from '~/utils/mailer'
-import jwt from 'jsonwebtoken'
 import { jwtUtils } from '~/utils/jwt'
 
 const createNew = async (reqBody) => {
@@ -19,20 +16,10 @@ const createNew = async (reqBody) => {
   }
 }
 
-const getUser = async (address) => {
-  try {
-
-    const userInfor = await userModel.getUser(address)
-    if (!userInfor) {
-      throw new ApiError(StatusCodes.NOT_FOUND, 'User not found')
-    }
-    return userInfor
-  } catch (error) { throw error }
-}
 
 const updateUserByAddress = async (data) => {
   try {
-    return await userModel.findUserAndUpdate(data)
+    return await userModel.updateUserByAdderss(data)
   } catch (error) { throw error }
 }
 
@@ -79,7 +66,7 @@ const verifyKyc = async (data) => {
       process.env.REFRESH_TOKEN_LIFE || '7d'
     )
 
-    const user = await userModel.findUserAndUpdate({
+    const user = await userModel.updateUserByAdderss({
       address: data.address,
       email:data.email,
       isKyc:true,
@@ -95,12 +82,18 @@ const getUsers = async (pagination, filter, options) => {
   } catch (error) { throw error}
 }
 
+const updateScore = async( { address, score }) => {
+  try {
+    const user = await userModel.findUserByAddress(address)
+    return await userModel.updateUserByAdderss({ address, score: score + user.score })
+  } catch (error) { throw error}}
+
 export const userService = {
   createNew,
-  getUser,
   updateUserByAddress,
   checkExistEmail,
   verifyKyc,
   requestKyc,
-  getUsers
+  getUsers,
+  updateScore
 }

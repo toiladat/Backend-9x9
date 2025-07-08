@@ -9,11 +9,20 @@ import cors from 'cors'
 import { corsOptions } from './config/cors'
 import { getSwaggerSpec } from './config/swagger'
 import swaggerUi from 'swagger-ui-express'
+import rateLimit from 'express-rate-limit'
+
 dotenv.config()
 
 const START_SERVER = () => {
 
   const app = express()
+  const scoreLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 phút
+    max: 5, // chỉ 5 lần gọi API / phút
+    statusCode:500,
+    message: 'Too many requests'
+  })
+  // app.use(scoreLimiter)
   // app.use(cors(corsOptions))
   app.use(cors())
 
