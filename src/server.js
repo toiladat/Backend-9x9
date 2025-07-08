@@ -24,7 +24,15 @@ const START_SERVER = () => {
   })
   // app.use(scoreLimiter)
   // app.use(cors(corsOptions))
-  app.use(cors())
+  app.use(cors({
+    origin: [
+      'http://localhost:3000',
+      'https://backend-9x9.onrender.com',
+      'https://gasy-9x9-plus-fe.vercel.app'
+    ],
+    credentials: true
+  }))
+
 
 
   app.use(express.json())

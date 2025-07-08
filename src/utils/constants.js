@@ -1,7 +1,7 @@
 export const WHITELIST_DOMAINS = [
   'http://localhost:3000',
   'https://backend-9x9.onrender.com',
-  'https://gasy-9x9-plus-fe.vercel.app/'
+  'https://gasy-9x9-plus-fe.vercel.app'
 ]
 
 export const EMAIL_SUBJECT = 'Xác nhận KYC'
@@ -76,3 +76,7 @@ export const EMAIL_HTML = (otpKyc) => `
 </body>
 </html>
 `
+export const TOKEN_NAME = () => {
+  const tokenName = 'refreshToken9x9'
+  return Buffer.from(tokenName).toString('base64')
+}

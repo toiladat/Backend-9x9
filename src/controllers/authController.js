@@ -3,6 +3,7 @@ import { authService } from '~/services/authService'
 import { userModel } from '~/models/userModel'
 import { jwtUtils } from '~/utils/jwt'
 import ApiError from '~/utils/ApiError'
+import { TOKEN_NAME } from '~/utils/constants'
 
 //[GET] /auth/nonce/:address
 export const getNonce = async (req, res, next) => {
@@ -20,12 +21,15 @@ const login = async (req, res, next) => {
   try {
     const result = await authService.login(req.body)
     // Set HTTP-only secure cookie for refresh token
-    res.cookie('refreshToken', result.refreshToken, {
+
+
+    res.cookie(TOKEN_NAME, result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     })
+
 
     // Trả về thông tin user và access token (không trả về refresh token)
     res.status(StatusCodes.OK).json({
