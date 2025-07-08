@@ -60,19 +60,12 @@ const verifyKyc = async (data) => {
       process.env.ACCESS_TOKEN_LIFE || '15m'
     )
 
-    const refreshToken = await jwtUtils.generateToken(
-      { address: data.address },
-      process.env.REFRESH_TOKEN_SECRET,
-      process.env.REFRESH_TOKEN_LIFE || '7d'
-    )
-
     const user = await userModel.updateUserByAdderss({
       address: data.address,
       email:data.email,
-      isKyc:true,
-      refreshToken
+      isKyc:true
     })
-    return { accessToken, refreshToken, user }
+    return { accessToken, user }
   } catch (error) { throw error}
 }
 
