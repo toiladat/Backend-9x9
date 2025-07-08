@@ -3,7 +3,7 @@ import { userService } from '~/services/userService'
 import crypto from 'crypto'
 import { otpCache } from '~/utils/cache'
 import sendVerificationEmail from '~/utils/mailer'
-import { EMAIL_HTML, EMAIL_SUBJECT, TOKEN_NAME } from '~/utils/constants'
+import { EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
 import { userModel } from '~/models/userModel'
 
 //[PATCH]/user/kyc
@@ -51,7 +51,7 @@ const verifyKyc = async (req, res, next) => {
     otpCache.del(address)
     if (result.user) {
       // Trong controller
-      res.cookie( TOKEN_NAME, result.refreshToken, {
+      res.cookie( 'refreshToken9x9', result.refreshToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',

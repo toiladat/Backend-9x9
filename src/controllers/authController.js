@@ -3,7 +3,6 @@ import { authService } from '~/services/authService'
 import { userModel } from '~/models/userModel'
 import { jwtUtils } from '~/utils/jwt'
 import ApiError from '~/utils/ApiError'
-import { TOKEN_NAME } from '~/utils/constants'
 
 //[GET] /auth/nonce/:address
 export const getNonce = async (req, res, next) => {
@@ -23,7 +22,7 @@ const login = async (req, res, next) => {
     // Set HTTP-only secure cookie for refresh token
 
 
-    res.cookie(TOKEN_NAME, result.refreshToken, {
+    res.cookie('refreshToken9x9', result.refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',

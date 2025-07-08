@@ -76,7 +76,3 @@ export const EMAIL_HTML = (otpKyc) => `
 </body>
 </html>
 `
-export const TOKEN_NAME = () => {
-  const tokenName = 'refreshToken9x9'
-  return Buffer.from(tokenName).toString('base64')
-}
