@@ -107,7 +107,7 @@ const refreshAccessToken = async (refreshToken) => {
 
     return { accessToken: newAccessToken }
   } catch (error) {
-    throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token invalid or expired')
+    throw new ApiError(StatusCodes.UNAUTHORIZED, error.message || 'Refresh token invalid or expired')
   }
 }
 

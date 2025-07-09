@@ -1,4 +1,6 @@
 import jwt from 'jsonwebtoken'
+import ApiError from './ApiError'
+import { StatusCodes } from 'http-status-codes'
 
 const generateToken = async (user, secretSignature, tokenLife) => {
 
@@ -13,7 +15,7 @@ const generateToken = async (user, secretSignature, tokenLife) => {
     )
     return token
   } catch (error) {
-    throw error
+    throw new ApiError(StatusCodes.UNAUTHORIZED, new Error(error).message)
   }
 }
 
@@ -22,7 +24,7 @@ const verifyToken = async (token, secretKey) => {
     const decoded = await jwt.verify(token, secretKey)
     return decoded
   } catch (error) {
-    throw error
+    throw new ApiError(StatusCodes.UNAUTHORIZED, new Error(error).message)
   }
 }
 
