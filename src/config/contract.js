@@ -1,49 +1,41 @@
-// Importing the ethers.js library for Ethereum blockchain interaction
-require('dotenv').config()
-const ethers = require('ethers')
+// config/contractInstance.js
+import { ethers } from 'ethers'
+import dotenv from 'dotenv'
+import { contractABI } from './abi.js'
 
-// Configuration for QuickNode endpoint and user's private key
-const endPoint = 'https://arbitrum-sepolia.infura.io/v3/0b05e002a0c146fe943f9ad523d04bda'
+dotenv.config()
 
-const QUICKNODE_ENDPOINT = process.env.HTTP_PROVIDER_URL
-const PRIVATE_KEY = process.env.PRIVATE_KEY
+let contractRead = null
+let contractWrite = null
+let signer = null
 
-// Setting up the provider and signer to connect to the Ethereum network via QuickNode
-const provider = new ethers.JsonRpcProvider(QUICKNODE_ENDPOINT)
-const signer = new ethers.Wallet(PRIVATE_KEY, provider)
+export const CONNECT_CONTRACT = async () => {
+  try {
+    const QUICKNODE_ENDPOINT = process.env.HTTP_PROVIDER_URL
+    const PRIVATE_KEY = process.env.PRIVATE_KEY
 
-const userAddress = signer.address
+    const provider = new ethers.JsonRpcProvider(QUICKNODE_ENDPOINT)
 
-// Contract details: WETH contract on the Sepolia test network
-const contractAddress = '0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14'
-const contractABI = [
-  // ABI definitions for interacting with the contract
-  {
-    constant: true,
-    inputs: [{ name: '', type: 'address' }],
-    name: 'balanceOf',
-    outputs: [{ name: '', type: 'uint256' }],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    constant: false,
-    inputs: [],
-    name: 'deposit',
-    outputs: [],
-    payable: true,
-    stateMutability: 'payable',
-    type: 'function'
+    signer = new ethers.Wallet(PRIVATE_KEY, provider)
+
+    const contractAddress = process.env.CONTRACT_ADDRESS
+
+    contractRead = new ethers.Contract(contractAddress, contractABI, provider)
+    contractWrite = contractRead.connect(signer)
+
+    console.log('Kết nối thành công tới Smart Contract')
+  } catch (error) {
+    console.error('[Contract] ❌ Lỗi kết nối contract:', error.message)
   }
-]
+}
 
-// Instantiating the contract object for interacting with the WETH contract
-const contract = new ethers.Contract(contractAddress, contractABI, provider)
-const contractWithSigner = contract.connect(signer)
-
-// Reading from the contract
-// READ FUNCTION WILL BE HERE
-
-// Writing to the contract
-// WRITING FUNCTION WILL BE HERE
+export const GET_CONTRACT = () => {
+  if (!contractRead || !contractWrite || !signer) {
+    throw new Error('Phải kết nối contract trước!')
+  }
+  return {
+    contractRead,
+    contractWrite,
+    signer
+  }
+}

@@ -10,6 +10,7 @@ import { corsOptions } from './config/cors'
 import { getSwaggerSpec } from './config/swagger'
 import swaggerUi from 'swagger-ui-express'
 import rateLimit from 'express-rate-limit'
+import { CONNECT_CONTRACT } from './config/contract'
 
 dotenv.config()
 
@@ -32,9 +33,6 @@ const START_SERVER = () => {
     ],
     credentials: true
   }))
-
-
-
   app.use(express.json())
 
   const hostname = process.env.LOCAL_APP_HOST
@@ -61,6 +59,7 @@ const START_SERVER = () => {
 ( async () => {
   try {
     await CONNECT_DB()
+    await CONNECT_CONTRACT()
     console.log('Connectd to MongoDB Cloud Atlas')
     START_SERVER()
   } catch (error) {
