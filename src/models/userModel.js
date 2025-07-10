@@ -33,20 +33,17 @@ const validateBeforeCreate = async (data) => {
 const createUser = async (data) => {
   try {
     const validUser = await validateBeforeCreate(data)
-    const createdNew= await GET_DB().collection(USER_COLLECTION_NAME).insertOne(validUser)
-
-    return createdNew
+    return await GET_DB().collection(USER_COLLECTION_NAME).insertOne(validUser)
   }
   catch (err) { new Error(err) }
 }
 
 const findOneById = async(id) => {
   try {
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOne({
+    return await GET_DB().collection(USER_COLLECTION_NAME).findOne({
       _id: new ObjectId(id),
       _destroy:false
     })
-    return result
   } catch (error) { new Error(error)}
 }
 

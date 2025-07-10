@@ -7,7 +7,7 @@ import { jwtUtils } from '~/utils/jwt'
 
 const createNew = async (reqBody) => {
   try {
-    const createdUser= await userModel.createNew(reqBody)
+    const createdUser= await userModel.createUser(reqBody)
     const getNewUser = await userModel.findOneById(createdUser.insertedId)
     return getNewUser
   }
@@ -75,18 +75,11 @@ const getUsers = async (pagination, filter, options) => {
   } catch (error) { throw error}
 }
 
-const updateScore = async( { address, score }) => {
-  try {
-    const user = await userModel.findUserByAddress(address)
-    return await userModel.updateUserByAdderss({ address, score: score + user.score })
-  } catch (error) { throw error}}
-
 export const userService = {
   createNew,
   updateUserByAddress,
   checkExistEmail,
   verifyKyc,
   requestKyc,
-  getUsers,
-  updateScore
+  getUsers
 }

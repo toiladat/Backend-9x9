@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { StatusCodes } from 'http-status-codes'
-import { userService } from '~/services/userService'
+import { miningService } from '~/services/miningService'
 import ApiError from '~/utils/ApiError'
 import { miningGoldCache } from '~/utils/cache'
 import { PLAY_MAX_TIME, PLAY_MIN_TIME } from '~/utils/constants'
@@ -72,8 +72,9 @@ const submitScore = async (req, res, next) => {
 
     if (totalTime < PLAY_MIN_TIME || totalTime > PLAY_MAX_TIME)
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Thời gian chơi không hợp lệ')
-    const updatedUser = await userService.updateScore({ address, score })
-    res.status(StatusCodes.OK).json(updatedUser)
+    const result = await miningService.create({ address, score })
+
+    res.status(StatusCodes.OK).json(result)
   } catch (error) { next(error)}
 }
 
