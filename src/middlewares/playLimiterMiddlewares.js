@@ -1,8 +1,8 @@
 import rateLimit from 'express-rate-limit'
 
 export const playLimit = rateLimit({
-  windowMs: 60 * 1000, // 1 phút
-  max: 5, // chỉ 5 lần gọi API / phút
+  windowMs: 60 * 1000,
+  max: 5,
   statusCode:500,
-  message: 'Too many requests'
+  message: 'Bạn đã gửi quá nhiều yêu cầu. Vui lòng thử lại sau 1 phút.'
 })

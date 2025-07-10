@@ -44,7 +44,7 @@ const refreshToken = async (req, res, next) => {
     const refreshToken = req.body.refreshToken
 
     if (!refreshToken) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token is required')
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Yêu cầu refresh token')
     }
 
     // Verify token
@@ -55,7 +55,7 @@ const refreshToken = async (req, res, next) => {
     // Kiểm tra trong database
     const user = await userModel.findUserByAddress(decoded.address)
     if (!user || user.refreshToken !== refreshToken) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token')
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'refresh token không hợp lệ')
     }
     // Tạo access token mới
     const newAccessToken = await jwtUtils.generateToken(

@@ -1,7 +1,5 @@
 
 import nodeMailer from 'nodemailer'
-// import dotenv from 'dotenv'
-// dotenv.config()
 
 const sendVerificationEmail = (to, subject, htmlContent) => {
 

@@ -12,11 +12,11 @@ const requestKyc = async (req, res, next) => {
     //Check unique email
     const emailUsedByUser = await userService.checkExistEmail(req.body.email)
     if (emailUsedByUser) return res.status(StatusCodes.BAD_REQUEST).json({
-      message: 'Email is used by another user'
+      message: 'Email đã tồn tại'
     })
     const user = await userModel.findUserByAddress(req.decoded.address)
     if (user && user.email) return res.status(StatusCodes.FORBIDDEN).json({
-      message: 'Account was KYC'
+      message: 'Tài khoản đã KYC'
     })
     const data = {
       email: req.body.email,
@@ -29,7 +29,7 @@ const requestKyc = async (req, res, next) => {
       EMAIL_HTML(data.kycOtp)
     )
     return res.status(StatusCodes.OK).json({
-      message: 'OTP sent, please check your mailbox'
+      message: 'Đã gửi mã OTP, vui lòng kiểm tra email'
     })
 
   } catch (error) { next(error)}
@@ -43,7 +43,7 @@ const verifyKyc = async (req, res, next) => {
     const cachedData = otpCache.get(address)
     if (!cachedData || !cachedData.email || String(cachedData.kycOtp) != String(kycOtp)) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        message: 'No OTP data found, please start KYC process again.'
+        message: 'Phiên OTP đã hết hạn, vui lòng bắt đầu lại quy trình KYC'
       })
     }
 
@@ -53,7 +53,7 @@ const verifyKyc = async (req, res, next) => {
       return res.status(StatusCodes.OK).json(result)
     }
     return res.status(StatusCodes.BAD_REQUEST).json({
-      message:'KYC failed'
+      message:'KYC thất bại'
     })
 
   } catch (error) { next(error) }
@@ -67,7 +67,7 @@ const resendOtp = async (req, res, next) => {
 
     if (!cachedData || !cachedData.email) {
       return res.status(StatusCodes.BAD_REQUEST).json({
-        message: 'No OTP data found, please start KYC process again.'
+        message: 'Có lỗi xảy ra, vui lòng bắt đầu lại quy trình KYC'
       })
     }
     const newOtp = crypto.randomInt(100000, 999999).toString()
@@ -82,13 +82,12 @@ const resendOtp = async (req, res, next) => {
       EMAIL_HTML(newOtp)
     )
     return res.status(StatusCodes.OK).json({
-      message: 'OTP re-sent, please check your mailbox'
+      message: 'Đã gửi mã OTP, vui lòng kiểm tra email'
     })
   } catch (error) {
     next(error)
   }
 }
-
 
 //[GET]/user/ranking
 const getUsers = async (req, res, next) => {
@@ -99,6 +98,7 @@ const getUsers = async (req, res, next) => {
     return res.status(StatusCodes.OK).json(result)
   } catch (error) { next(error) }
 }
+
 export const userController = {
   requestKyc,
   verifyKyc,

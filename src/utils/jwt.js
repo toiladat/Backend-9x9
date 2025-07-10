@@ -15,13 +15,15 @@ const generateToken = async (user, secretSignature, tokenLife) => {
     )
     return token
   } catch (error) {
-    throw new ApiError(StatusCodes.UNAUTHORIZED, new Error(error).message)
+    throw new ApiError(StatusCodes.INTERNAL_SERVER_ERROR, new Error(error).message)
   }
 }
 
 const verifyToken = async (token, secretKey) => {
   try {
-    const decoded = await jwt.verify(token, secretKey)
+    const decoded = await jwt.verify(token, secretKey, {
+      algorithms: ['HS256']
+    })
     return decoded
   } catch (error) {
     throw new ApiError(StatusCodes.UNAUTHORIZED, new Error(error).message)

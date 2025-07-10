@@ -14,7 +14,7 @@ const login = async (reqBody) => {
     // Verify signature
     const recoveredAddress = ethers.verifyMessage(message, signature)
     if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Signature does not match message')
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Chữ ký không khớp với thông điệp')
     }
 
     // Check exist user and update nonce
@@ -31,7 +31,7 @@ const login = async (reqBody) => {
     } else {
       // Existing user - verify nonce
       if (user.nonce !== message) {
-        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid nonce')
+        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Thông điệp không hợp lệ')
       }
       // Update nonce after each login for security
       await userModel.updateUserByAdderss({
@@ -91,7 +91,7 @@ const refreshAccessToken = async (refreshToken) => {
     // Check if token exists in DB (prevent reuse)
     const user = await userModel.findOneById(decoded.userId)
     if (!user || !user.refreshToken !==refreshToken) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Invalid refresh token')
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token không tồn tại')
     }
 
     // Generate new access token
@@ -107,7 +107,7 @@ const refreshAccessToken = async (refreshToken) => {
 
     return { accessToken: newAccessToken }
   } catch (error) {
-    throw new ApiError(StatusCodes.UNAUTHORIZED, error.message || 'Refresh token invalid or expired')
+    throw new ApiError(StatusCodes.UNAUTHORIZED, error.message || 'Refresh token không hợp lệ hoặc hết hạn')
   }
 }
 

@@ -29,8 +29,8 @@ Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
  *       500:
  *         description: Lỗi server
  */
-Route.route(playLimit, '/start')
-  .get( miningController.startMining )
+Route.route('/start')
+  .get(playLimit, miningController.startMining )
 
 
 /**
@@ -83,8 +83,8 @@ Route.route(playLimit, '/start')
  *       500:
  *         description: Lỗi server
  */
-Route.route(playLimit, '/submit')
-  .post(userValidation.minningGold, miningController.submitScore)
+Route.route('/submit')
+  .post(playLimit, userValidation.minningGold, miningController.submitScore)
 
 
 /**

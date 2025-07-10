@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { userService } from '~/services/userService'
 import ApiError from '~/utils/ApiError'
 import { miningGoldCache } from '~/utils/cache'
+import { PLAY_MAX_TIME, PLAY_MIN_TIME } from '~/utils/constants'
 
 // [POST] /mining/start
 const startMining = async (req, res, next) => {
@@ -26,8 +27,8 @@ const pauseMining = async (req, res, next) => {
   try {
     const { sessionId } = req.body
     const session = miningGoldCache.get(sessionId)
-    if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid session')
-    if (session.status !=='playing') throw new ApiError(StatusCodes.BAD_REQUEST, 'Session not in playing state')
+    if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Phiên chơi không tồn tại hoặc đã kết thúc')
+    if (session.status !=='playing') throw new ApiError(StatusCodes.BAD_REQUEST, 'Trạng thái phiên không hợp lệ')
     session.totalPlayTime += (Date.now() - session.startAt) / 1000
     session.status ='paused'
     session.pauseAt= Date.now()
@@ -45,8 +46,8 @@ const continueMining = async (req, res, next) => {
   try {
     const { sessionId } = req.body
     const session = miningGoldCache.get(sessionId)
-    if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid session')
-    if (session.status !=='paused') throw new ApiError(StatusCodes.BAD_REQUEST, 'Session not in playing state')
+    if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Phiên chơi không tồn tại hoặc đã kết thúc')
+    if (session.status !=='paused') throw new ApiError(StatusCodes.BAD_REQUEST, 'Trạng thái phiên không hợp lệ')
     session.startAt = Date.now()
     session.status= 'playing'
     miningGoldCache.set(sessionId, session)
@@ -63,14 +64,14 @@ const submitScore = async (req, res, next) => {
     const address = req.decoded.address
     const { sessionId, score } = req.body
     const session = miningGoldCache.get(sessionId)
-    if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Invalid session')
-    if (session.address !== address) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Invalid session owner' })
+    if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Phiên chơi không tồn tại hoặc đã kết thúc')
+    if (session.address !== address) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Bạn không phải chủ sở hữu của phiên này' })
 
     const totalTime =session.totalPlayTime + (Date.now() - session.startAt) / 1000
     miningGoldCache.del(sessionId)
 
-    if (totalTime < 5 || totalTime > 120)
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'session duration is invalid')
+    if (totalTime < PLAY_MIN_TIME || totalTime > PLAY_MAX_TIME)
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Thời gian chơi không hợp lệ')
     const updatedUser = await userService.updateScore({ address, score })
     res.status(StatusCodes.OK).json(updatedUser)
   } catch (error) { next(error)}

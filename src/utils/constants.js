@@ -76,3 +76,6 @@ export const EMAIL_HTML = (otpKyc) => `
 </body>
 </html>
 `
+
+export const PLAY_MIN_TIME = 5
+export const PLAY_MAX_TIME = 120

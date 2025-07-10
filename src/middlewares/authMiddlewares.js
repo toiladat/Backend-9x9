@@ -9,7 +9,7 @@ const auth =async (req, res, next) => {
   const authHeader = req.headers?.authorization
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(StatusCodes.UNAUTHORIZED).json({
-      message: 'Token is not valid or empty'
+      message: 'Token không hợp lệ hoặc để trống'
     })
   }
   const token = authHeader.split(' ')[1]
@@ -30,7 +30,7 @@ const isKyc = (req, res, next) => {
     return next()
   }
   return res.status(StatusCodes.FORBIDDEN).json({
-    message: 'Please KYC before take action'
+    message: 'Vui lòng KYC trước khi truy cập'
   })
 }
 export const authMiddlewares = {
