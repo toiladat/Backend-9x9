@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { miningController } from '~/controllers/miningController'
 import { authMiddlewares } from '~/middlewares/authMiddlewares'
+import { playLimit } from '~/middlewares/playLimiterMiddlewares'
 import { userValidation } from '~/validations/userValidation'
 const Route = Router()
 Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
@@ -28,7 +29,7 @@ Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
  *       500:
  *         description: Lỗi server
  */
-Route.route('/start')
+Route.route(playLimit, '/start')
   .get( miningController.startMining )
 
 
@@ -82,7 +83,7 @@ Route.route('/start')
  *       500:
  *         description: Lỗi server
  */
-Route.route('/submit')
+Route.route(playLimit, '/submit')
   .post(userValidation.minningGold, miningController.submitScore)
 
 
