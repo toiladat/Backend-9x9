@@ -2,6 +2,7 @@
 import { ethers } from 'ethers'
 import dotenv from 'dotenv'
 import { contractABI } from './abi.js'
+import { Network, Alchemy } from 'alchemy-sdk'
 
 dotenv.config()
 
@@ -11,10 +12,16 @@ let signer = null
 
 export const CONNECT_CONTRACT = async () => {
   try {
-    const QUICKNODE_ENDPOINT = process.env.HTTP_PROVIDER_URL
-    const PRIVATE_KEY = process.env.PRIVATE_KEY
 
-    const provider = new ethers.JsonRpcProvider(QUICKNODE_ENDPOINT)
+    const settings = {
+      apiKey: process.env.ALCHEMY_KEY,
+      network: Network.ETH_SEPOLIA
+    }
+    const alchemy = new Alchemy(settings)
+
+    // Lấy provider từ Alchemy
+    const provider = await alchemy.config.getProvider()
+    const PRIVATE_KEY = process.env.PRIVATE_KEY
 
     signer = new ethers.Wallet(PRIVATE_KEY, provider)
 
@@ -29,7 +36,7 @@ export const CONNECT_CONTRACT = async () => {
   }
 }
 
-export const GET_CONTRACT = () => {
+export const GET_CONTRACT =async () => {
   if (!contractRead || !contractWrite || !signer) {
     throw new Error('Phải kết nối contract trước!')
   }

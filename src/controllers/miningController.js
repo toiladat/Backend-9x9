@@ -68,12 +68,11 @@ const submitScore = async (req, res, next) => {
     if (session.address !== address) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Bạn không phải chủ sở hữu của phiên này' })
 
     const totalTime =session.totalPlayTime + (Date.now() - session.startAt) / 1000
-    miningGoldCache.del(sessionId)
 
     if (totalTime < PLAY_MIN_TIME || totalTime > PLAY_MAX_TIME)
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Thời gian chơi không hợp lệ')
     const result = await miningService.create({ address, score })
-
+    miningGoldCache.del(sessionId)
     res.status(StatusCodes.OK).json(result)
   } catch (error) { next(error)}
 }
