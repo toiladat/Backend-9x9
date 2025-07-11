@@ -1,9 +1,9 @@
 import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
-import { ADRESS_RULE, UUID_V4_MESSAGE, UUID_V4_RULE } from '~/utils/Validator'
+import { ADDRESS_RULE, UUID_V4_MESSAGE, UUID_V4_RULE } from '~/utils/Validator'
 const MINING_HISTORY_COLLECTION_NAME = 'miningHistories'
 const MINING_HISTORY_COLLECTION_SCHEMA= Joi.object({
-  address: Joi.string().pattern(ADRESS_RULE).required().trim().strict(),
+  address: Joi.string().pattern(ADDRESS_RULE).required().trim().strict(),
   score: Joi.number().min(0).default(0),
   sessionId: Joi.string().pattern(UUID_V4_RULE).message(UUID_V4_MESSAGE),
   startTime: Joi.date().timestamp('javascript').default(Date.now)

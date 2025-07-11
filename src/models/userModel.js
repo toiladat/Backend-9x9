@@ -1,17 +1,18 @@
 import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
-import { ADRESS_RULE, OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/Validator'
+import { ADDRESS_RULE, OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/Validator'
 import { ObjectId } from 'mongodb'
 
 const USER_COLLECTION_NAME = 'users'
 
 const USER_COLLECTION_SCHEMA = Joi.object({
-  address: Joi.string().pattern(ADRESS_RULE).required().trim().strict(),
+  address: Joi.string().pattern(ADDRESS_RULE).required().trim().strict(),
   nonce: Joi.string().length(32).hex().required(),
   isKyc: Joi.boolean().default(false),
   name:Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
   score: Joi.number().min(0).default(0),
+  invitedBy: Joi.string().pattern(ADDRESS_RULE).trim().strict(),
   history: Joi.array()
     .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
     .default([]),

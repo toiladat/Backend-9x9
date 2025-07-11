@@ -21,7 +21,8 @@ const START_SERVER = () => {
     origin: [
       'http://localhost:3000',
       'https://backend-9x9.onrender.com',
-      'https://gasy-9x9-plus-fe.vercel.app'
+      'https://gasy-9x9-plus-fe.vercel.app',
+      'https://gasy-9x9-plus-fe-git-main-phantansy2005devs-projects.vercel.app/'
     ],
     credentials: true
   }))
