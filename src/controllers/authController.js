@@ -37,7 +37,7 @@ const login = async (req, res, next) => {
 }
 
 
-// [POST] /auth/refresh
+//[POST] /auth/refresh
 const refreshToken = async (req, res, next) => {
   try {
     // Nhận refresh token từ cookie hoặc body
@@ -47,39 +47,46 @@ const refreshToken = async (req, res, next) => {
       throw new ApiError(StatusCodes.UNAUTHORIZED, 'Yêu cầu refresh token')
     }
 
-    // Verify token
-    const decoded = await jwtUtils.verifyToken(
-      refreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    )
-    // Kiểm tra trong database
-    const user = await userModel.findUserByAddress(decoded.address)
-    if (!user || user.refreshToken !== refreshToken) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'refresh token không hợp lệ')
-    }
-    // Tạo access token mới
-    const newAccessToken = await jwtUtils.generateToken(
-      {
-        userId: user._id,
-        address: user.address,
-        isKyc: user.isKyc
-      },
-      process.env.ACCESS_TOKEN_SECRET,
-      process.env.ACCESS_TOKEN_LIFE || '15m'
-    )
+    const result = await authService.refreshAccessToken(refreshToken)
 
-    // Trả về access token mới
-    res.status(StatusCodes.OK).json({
-      accessToken: newAccessToken
+    res.cookie('refreshToken9x9', result.newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    })
+    res.cookie('accessToken9x9', result.newAccessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
     })
 
+    if (process.env.BUILD_MODE === 'dev') {
+      res.status(StatusCodes.OK).json({
+        success: true,
+        accessToken: result.newAccessToken,
+        refreshToken: result.newRefreshToken
+      })
+    } else {
+      res.status(StatusCodes.OK).json({ success: true })
+    }
   } catch (error) {
     next(error)
   }
 }
 
+//[POST] /auth/logout
+const logout = async (req, res, next) => {
+  try {
+    const { address } = req.decoded.address
+    await authService.updateRefreshToken({ address, refreshToken: null })
+    res.status(StatusCodes.OK).json({ success:true })
+  } catch (error) { next(error)}
+}
 export const authController = {
   getNonce,
   login,
-  refreshToken
+  refreshToken,
+  logout
 }

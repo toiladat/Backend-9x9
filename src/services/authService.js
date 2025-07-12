@@ -79,22 +79,19 @@ const login = async (reqBody) => {
     throw error
   }
 }
-
 const refreshAccessToken = async (refreshToken) => {
   try {
-    // Verify refresh token
     const decoded = await jwtUtils.verifyToken(
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET
     )
 
-    // Check if token exists in DB (prevent reuse)
-    const user = await userModel.findOneById(decoded.userId)
-    if (!user || !user.refreshToken !==refreshToken) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token không tồn tại')
+    const user = await userModel.findUserByAddress(decoded.address)
+    if ( user.refreshToken !== refreshToken) {
+      await updateRefreshToken({ address: user.address, refreshToken: null })
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Refresh token không hợp lệ')
     }
 
-    // Generate new access token
     const newAccessToken = await jwtUtils.generateToken(
       {
         userId: user._id,
@@ -105,15 +102,35 @@ const refreshAccessToken = async (refreshToken) => {
       process.env.ACCESS_TOKEN_LIFE || '15m'
     )
 
-    return { accessToken: newAccessToken }
+    const expiresInSeconds = decoded.exp - Math.floor(Date.now() / 1000)
+
+    const newRefreshToken = await jwtUtils.generateToken(
+      { address: user.address },
+      process.env.REFRESH_TOKEN_SECRET,
+      expiresInSeconds
+    )
+
+    await updateRefreshToken({
+      address: user.address,
+      refreshToken: newRefreshToken
+    })
+
+    return { newAccessToken, newRefreshToken }
+
   } catch (error) {
-    throw new ApiError(StatusCodes.UNAUTHORIZED, error.message || 'Refresh token không hợp lệ hoặc hết hạn')
+    throw new ApiError(StatusCodes.UNAUTHORIZED, error.message || 'Refresh token không hợp lệ hoặc đã hết hạn')
   }
 }
-
+const updateRefreshToken = async (data) => {
+  try {
+    const { address, refreshToken } = data
+    return await userModel.updateUserByAdderss({ address, refreshToken })
+  } catch (error) { throw error}
+}
 
 export const authService = {
   login,
   refreshAccessToken,
-  generateNonce
+  generateNonce,
+  updateRefreshToken
 }

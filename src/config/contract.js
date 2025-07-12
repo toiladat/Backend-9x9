@@ -1,48 +1,60 @@
-// config/contractInstance.js
-import { ethers } from 'ethers'
-import dotenv from 'dotenv'
-import { contractABI } from './abi.js'
-import { Network, Alchemy } from 'alchemy-sdk'
+import { ethers } from 'ethers';
+import dotenv from 'dotenv';
+import { contractABI } from './abi.js';
 
-dotenv.config()
+dotenv.config();
 
-let contractRead = null
-let contractWrite = null
-let signer = null
+// Biến lưu trữ contract instance
+let contractRead = null;
+let contractWrite = null;
+let eventListener = null;
 
 export const CONNECT_CONTRACT = async () => {
   try {
+    // 1. Kết nối WebSocket Provider (bắt buộc để lắng nghe real-time)
+    const provider = new ethers.WebSocketProvider(
+      'wss://eth-sepolia.g.alchemy.com/v2/FJVO6TUmIb5ytV398zp5qww6BOJfB8mK'
+    );
 
-    const settings = {
-      apiKey: process.env.ALCHEMY_KEY,
-      network: Network.ETH_SEPOLIA
-    }
-    const alchemy = new Alchemy(settings)
+    // 2. Tạo contract instance
+    contractRead = new ethers.Contract(
+      process.env.CONTRACT_ADDRESS,
+      contractABI,
+      provider
+    );
 
-    // Lấy provider từ Alchemy
-    const provider = await alchemy.config.getProvider()
-    const PRIVATE_KEY = process.env.PRIVATE_KEY
+    // 3. Tạo signer cho giao dịch write
+    const signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+    contractWrite = contractRead.connect(signer);
 
-    signer = new ethers.Wallet(PRIVATE_KEY, provider)
+    // 4. Lắng nghe sự kiện từ hàm write
+    eventListener = contractRead.on('BoxPurchased', (address, numBox, priceBox) => {
+      console.log(`📦 User ${address} vừa mở hộp với ${numBox} `);
 
-    const contractAddress = process.env.CONTRACT_ADDRESS
+      console.log('Chi tiết:', priceBox);
+      
+    });
 
-    contractRead = new ethers.Contract(contractAddress, contractABI, provider)
-    contractWrite = contractRead.connect(signer)
-
-    console.log('Kết nối thành công tới Smart Contract')
+    console.log('✅ Đã bắt đầu lắng nghe sự kiện BoxOpened');
   } catch (error) {
-    console.error('[Contract] ❌ Lỗi kết nối contract:', error.message)
+    console.error('❌ Lỗi kết nối:', error);
+    throw error;
   }
-}
+};
 
-export const GET_CONTRACT =async () => {
-  if (!contractRead || !contractWrite || !signer) {
-    throw new Error('Phải kết nối contract trước!')
+// Hàm xử lý khi nhận được sự kiện
+const processDeposit = (user, amount, txHash) => {
+  // Gọi API backend hoặc lưu vào database
+  fetch('/api/deposit', {
+    method: 'POST',
+    body: JSON.stringify({ user, amount: ethers.formatEther(amount), txHash })
+  });
+};
+
+// Hủy lắng nghe khi cần
+export const STOP_LISTENING = () => {
+  if (eventListener) {
+    contractRead.off('BoxOpened', eventListener);
+    console.log('🛑 Đã dừng lắng nghe sự kiện');
   }
-  return {
-    contractRead,
-    contractWrite,
-    signer
-  }
-}
+};

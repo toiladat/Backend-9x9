@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { authController } from '~/controllers/authController'
+import { authMiddlewares } from '~/middlewares/authMiddlewares'
 import { addressValidation } from '~/validations/addressValidation'
 import { userValidation } from '~/validations/userValidation'
 
@@ -11,7 +12,7 @@ const Route = Router()
  *   get:
  *     summary: Lấy nonce để xác thực địa chỉ ví
  *     tags:
- *       - Auth
+ *       - AUTH
  *     parameters:
  *       - in: path
  *         name: address
@@ -54,7 +55,7 @@ Route.route('/nonce/:address')
  *   post:
  *     summary: Đăng nhập người dùng bằng chữ ký ví
  *     tags:
- *       - Auth
+ *       - AUTH
  *     requestBody:
  *       required: true
  *       content:
@@ -101,6 +102,32 @@ Route.route('/login')
 
 /**
  * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: Đẵng xuất
+ *     tags:
+ *       - AUTH
+ *     responses:
+ *       200:
+ *         description: Đăng xuất
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *       401:
+ *         description: Chưa xác thực hoặc token không hợp lệ
+ *       500:
+ *         description: Lỗi server
+ */
+Route.route('/logout')
+  .post(authMiddlewares.auth, authController.logout)
+
+/**
+ * @swagger
  * /auth/refresh-token:
  *   post:
  *     summary: Refresh access token using refresh token
@@ -108,7 +135,7 @@ Route.route('/login')
  *       - Dùng refresh token (từ cookie hoặc body) để lấy access token mới
  *       - Refresh token phải còn hiệu lực và hợp lệ trong database
  *     tags:
- *       - Auth
+ *       - AUTH
  *     parameters:
  *       - in: cookie
  *         name: refreshToken
@@ -160,4 +187,4 @@ Route.route('/login')
  */
 Route.route('/refresh-token')
   .post(authController.refreshToken)
-export const authRoute = Route
+export const authRoute = Route 
