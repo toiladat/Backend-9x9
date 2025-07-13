@@ -48,19 +48,15 @@ const refreshToken = async (req, res, next) => {
     }
 
     const result = await authService.refreshAccessToken(refreshToken)
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000
+    }
 
-    res.cookie('refreshToken9x9', result.newRefreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    })
-    res.cookie('accessToken9x9', result.newAccessToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    })
+    res.cookie('refreshToken9x9', result.newRefreshToken, options)
+    res.cookie('accessToken9x9', result.newAccessToken, options)
 
     if (process.env.BUILD_MODE === 'dev') {
       res.status(StatusCodes.OK).json({
@@ -81,11 +77,14 @@ const logout = async (req, res, next) => {
   try {
     const { address } = req.decoded.address
     await authService.updateRefreshToken({ address, refreshToken: null })
-    res.clearCookie('authData', {
-      httpOnly:true,
-      secure: true,
+    const options = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict'
-    })
+    }
+
+    res.clearCookie('authData', options)
+    res.clearCookie('refreshToken9x9', options)
     res.status(StatusCodes.OK).json({ success:true })
   } catch (error) { next(error)}
 }

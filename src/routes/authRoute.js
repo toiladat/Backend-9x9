@@ -187,4 +187,4 @@ Route.route('/logout')
  */
 Route.route('/refresh-token')
   .post(authController.refreshToken)
-export const authRoute = Route 
+export const authRoute = Route

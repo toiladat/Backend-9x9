@@ -35,5 +35,3 @@ export const GET_CONTRACT =async () => {
     signer
   }
 }
-
-
