@@ -81,6 +81,11 @@ const logout = async (req, res, next) => {
   try {
     const { address } = req.decoded.address
     await authService.updateRefreshToken({ address, refreshToken: null })
+    res.clearCookie('authData', {
+      httpOnly:true,
+      secure: true,
+      sameSite: 'strict'
+    })
     res.status(StatusCodes.OK).json({ success:true })
   } catch (error) { next(error)}
 }
