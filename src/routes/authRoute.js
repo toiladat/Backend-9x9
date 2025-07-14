@@ -124,7 +124,7 @@ Route.route('/login')
  *         description: Lỗi server
  */
 Route.route('/logout')
-  .post(authMiddlewares.auth, authController.logout)
+  .post( authController.logout)
 
 /**
  * @swagger

@@ -1,8 +1,8 @@
 import { StatusCodes } from 'http-status-codes'
 import { authService } from '~/services/authService'
 import { userModel } from '~/models/userModel'
-import { jwtUtils } from '~/utils/jwt'
 import ApiError from '~/utils/ApiError'
+import { jwtUtils } from '~/utils/jwt'
 
 //[GET] /auth/nonce/:address
 export const getNonce = async (req, res, next) => {
@@ -75,14 +75,13 @@ const refreshToken = async (req, res, next) => {
 //[POST] /auth/logout
 const logout = async (req, res, next) => {
   try {
-    const { address } = req.decoded.address
-    await authService.updateRefreshToken({ address, refreshToken: null })
+    const decoded =await jwtUtils.verifyToken(req.cookies.refreshToken9x9, process.env.REFRESH_TOKEN_SECRET)
+    await authService.updateRefreshToken({ address: decoded.address, refreshToken: null })
     const options = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict'
     }
-
     res.clearCookie('authData', options)
     res.clearCookie('refreshToken9x9', options)
     res.status(StatusCodes.OK).json({ success:true })

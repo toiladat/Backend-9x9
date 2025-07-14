@@ -19,6 +19,7 @@
     "@babel/runtime": "^7.22.10",
     "alchemy-sdk": "^3.6.1",
     "bcryptjs": "^3.0.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "crypto": "^1.0.1",

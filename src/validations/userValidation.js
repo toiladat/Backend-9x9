@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import Joi from 'joi'
 import ApiError from '~/utils/ApiError'
-import { BIRTH_RULE } from '~/utils/Validator'
+import { ADDRESS_RULE, BIRTH_RULE } from '~/utils/Validator'
 const createUser =async (req, res, next ) => {
 
   const correctCodition = Joi.object({
@@ -36,6 +36,9 @@ const login = async (req, res, next) => {
     message: Joi.string().required().trim().strict().messages({
       'string.empty': 'Thông điệp không được để trống',
       'any.required': 'Vui lòng gửi kèm thông điệp'
+    }),
+    invitedBy:Joi.string().optional().pattern(ADDRESS_RULE).trim().strict().messages({
+      'string.pattern.base':'Địa chỉ ví người mời không hợp lệ'
     })
   }).strict()
   try {

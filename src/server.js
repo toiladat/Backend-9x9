@@ -10,6 +10,7 @@ import { corsOptions } from './config/cors'
 import { getSwaggerSpec } from './config/swagger'
 import swaggerUi from 'swagger-ui-express'
 import { CONNECT_CONTRACT } from './config/contract'
+import cookieParser from 'cookie-parser'
 
 dotenv.config()
 
@@ -30,7 +31,7 @@ const START_SERVER = () => {
 
   const hostname = process.env.LOCAL_APP_HOST
   const port = process.env.LOCAL_APP_PORT
-
+  app.use(cookieParser())
   app.use('/api', ClientRoute)
   app.use( errorHandlingMiddleware)
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getSwaggerSpec()))
