@@ -12,7 +12,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   name:Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
   score: Joi.number().min(0).default(0),
-  invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
+  // invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
   availableMoney: Joi.number().integer().min(0).default(0),
   pendingMoney: Joi.number().integer().min(0).default(0),
   history: Joi.array()

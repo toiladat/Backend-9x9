@@ -20,13 +20,13 @@ const login = async (reqBody) => {
     // Check exist user and update nonce
     let user = await userModel.findUserByAddress(address)
 
-    if (!user && reqBody.invitedBy) {
-      const invitedByUser = await userModel.findUserByAddress(reqBody.invitedBy)
-      if (!invitedByUser) throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
+    if (!user) {
+      // const invitedByUser = await userModel.findUserByAddress(reqBody.invitedBy)
+      // if (!invitedByUser) throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
       const createdUser = await userModel.createUser({
         address,
         nonce: generateNonce(),
-        invitedBy: invitedByUser.address,
+        // invitedBy: invitedByUser.address,
         refreshToken: null
       })
 
