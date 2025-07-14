@@ -110,7 +110,7 @@ const minningGold = async (req, res, next) => {
       'string.guid': 'SessionId không đúng định dạng',
       'string.empty': 'SessionId không được để trống'
     }),
-    score: Joi.number().integer().min(0).max(40).required().messages({
+    score: Joi.number().integer().min(0).max(500).required().messages({
       'any.required': 'Điểm là bắt buộc',
       'number.base': 'Điểm phải là số',
       'number.integer': 'Điểm phải là số nguyên',

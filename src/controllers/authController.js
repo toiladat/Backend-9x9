@@ -65,7 +65,7 @@ const refreshToken = async (req, res, next) => {
         refreshToken: result.newRefreshToken
       })
     } else {
-      res.status(StatusCodes.OK).json({ success: true })
+      res.status(StatusCodes.OK).json({ success: true, accessToken:  result.newAccessToken })
     }
   } catch (error) {
     next(error)
