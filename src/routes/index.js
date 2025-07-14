@@ -11,5 +11,5 @@ Route.use('/user', userRoute)
 Route.use('/auth', authRoute)
 Route.use('/numerology', numerologyRoute)
 Route.use('/mining', miningRoute)
-Route.use('/contract', boxRoute)
+Route.use('/box', boxRoute)
 export const ClientRoute = Route

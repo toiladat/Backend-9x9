@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { boxController } from '~/controllers/boxController'
 import { authMiddlewares } from '~/middlewares/authMiddlewares'
+import { boxMiddewares } from '~/middlewares/boxMiddewares'
 const Route = Router()
 
 Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
@@ -8,7 +9,7 @@ Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
 
 /**
  * @swagger
- * /contract/open-box:
+ * /box/open:
  *   post:
  *     summary: Mở box
  *     tags:
@@ -43,6 +44,6 @@ Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
  *       500:
  *         description: Lỗi server
  */
-Route.route('/open-box')
-  .post(boxController.openBox)
+Route.route('/open')
+  .post(boxMiddewares.validTransaction, boxController.openBox)
 export const boxRoute = Route
