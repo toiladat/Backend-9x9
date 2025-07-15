@@ -32,7 +32,6 @@ Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
 Route.route('/start')
   .get(playLimit, miningController.startMining )
 
-
 /**
  * @swagger
  * /mining/submit:
@@ -85,7 +84,6 @@ Route.route('/start')
  */
 Route.route('/submit')
   .post(playLimit, userValidation.minningGold, miningController.submitScore)
-
 
 /**
  * @swagger
@@ -172,4 +170,31 @@ Route.route('/pause')
  */
 Route.route('/continue')
   .patch(miningController.continueMining)
+
+/**
+ * @swagger
+ * /mining/rest-times:
+ *   get:
+ *     summary: Lấy hạn mức chơi
+ *     tags:
+ *       - MINING GOLD
+ *     responses:
+ *       200:
+ *         description: số lượt chơi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 restTimes:
+ *                   type: number
+ *                   example: 5
+ *                 totalTimes:
+ *                   type: number
+ *                   example: 9
+ *       500:
+ *         description: Lỗi server
+ */
+Route.route('/rest-times')
+  .get(miningController.getRestTimes)
 export const miningRoute = Route

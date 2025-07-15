@@ -4,6 +4,7 @@ import { miningService } from '~/services/miningService'
 import ApiError from '~/utils/ApiError'
 import { miningGoldCache } from '~/utils/cache'
 import { PLAY_MAX_TIME, PLAY_MIN_TIME } from '~/utils/constants'
+import { userModel } from '~/models/userModel'
 
 // [POST] /mining/start
 const startMining = async (req, res, next) => {
@@ -63,6 +64,7 @@ const submitScore = async (req, res, next) => {
   try {
     const address = req.decoded.address
     const { sessionId, score } = req.body
+
     const session = miningGoldCache.get(sessionId)
     if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Phiên chơi không tồn tại hoặc đã kết thúc')
     if (session.address !== address) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Bạn không phải chủ sở hữu của phiên này' })
@@ -77,10 +79,18 @@ const submitScore = async (req, res, next) => {
   } catch (error) { next(error)}
 }
 
+// [GET] /mining/rest-times
+const getRestTimes = async (req, res, next) => {
+  try {
+    const result = await miningService.getRestTimes(req.decoded.address)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) { next(error)}
+}
 
 export const miningController = {
   startMining,
   pauseMining,
   continueMining,
-  submitScore
+  submitScore,
+  getRestTimes
 }

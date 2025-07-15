@@ -2,6 +2,7 @@ import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
 import { ADDRESS_RULE, OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/Validator'
 import { ObjectId } from 'mongodb'
+import { MAX_PLAY_TIMES } from '~/utils/constants'
 
 const USER_COLLECTION_NAME = 'users'
 
@@ -12,6 +13,8 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   name:Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
   score: Joi.number().min(0).default(0),
+  restTimes: Joi.number().min(0).max(MAX_PLAY_TIMES).default(MAX_PLAY_TIMES).strict(),
+  lastUpdatedTime: Joi.date().timestamp('javascript').default(null),
   // invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
   availableMoney: Joi.number().integer().min(0).default(0),
   pendingMoney: Joi.number().integer().min(0).default(0),
