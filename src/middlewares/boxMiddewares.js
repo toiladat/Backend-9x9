@@ -1,4 +1,4 @@
-import ethers from 'ethers'
+import { ethers } from 'ethers'
 import { StatusCodes } from 'http-status-codes'
 import { contractABI } from '~/config/abi'
 import { GET_CONTRACT } from '~/config/contract'
@@ -12,7 +12,7 @@ const validTransaction = async (req, res, next) => {
     const receipt = await provider.getTransactionReceipt(txHash)
     const iface = new ethers.Interface(contractABI)
 
-    if ( ! receipt.status) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
+    if ( receipt.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
     const contractAddress = process.env.CONTRACT_ADDRESS
     const targetLog = receipt.logs.find(
       log => log.address.toLowerCase() === contractAddress.toLowerCase()

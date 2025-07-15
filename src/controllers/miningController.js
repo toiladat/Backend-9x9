@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { miningService } from '~/services/miningService'
 import ApiError from '~/utils/ApiError'
 import { miningGoldCache } from '~/utils/cache'
-import { PLAY_MAX_TIME, PLAY_MIN_TIME } from '~/utils/constants'
+import { PLAY_MIN_TIME } from '~/utils/constants'
 import { userModel } from '~/models/userModel'
 
 // [POST] /mining/start
@@ -28,7 +28,7 @@ const pauseMining = async (req, res, next) => {
   try {
     const { sessionId } = req.body
     const session = miningGoldCache.get(sessionId)
-    if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Phiên chơi không tồn tại hoặc đã kết thúc')
+    if (!session) throw new ApiError(StatusCodes.BAD_REQUEST, 'Phiên chơi không tồn tại hoặc đã kết thúc')
     if (session.status !=='playing') throw new ApiError(StatusCodes.BAD_REQUEST, 'Trạng thái phiên không hợp lệ')
     session.totalPlayTime += (Date.now() - session.startAt) / 1000
     session.status ='paused'
@@ -47,7 +47,7 @@ const continueMining = async (req, res, next) => {
   try {
     const { sessionId } = req.body
     const session = miningGoldCache.get(sessionId)
-    if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Phiên chơi không tồn tại hoặc đã kết thúc')
+    if (!session) throw new ApiError(StatusCodes.BAD_REQUEST, 'Phiên chơi không tồn tại hoặc đã kết thúc')
     if (session.status !=='paused') throw new ApiError(StatusCodes.BAD_REQUEST, 'Trạng thái phiên không hợp lệ')
     session.startAt = Date.now()
     session.status= 'playing'
@@ -66,12 +66,12 @@ const submitScore = async (req, res, next) => {
     const { sessionId, score } = req.body
 
     const session = miningGoldCache.get(sessionId)
-    if (!session) throw new ApiError(StatusCodes.NOT_FOUND, 'Phiên chơi không tồn tại hoặc đã kết thúc')
-    if (session.address !== address) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Bạn không phải chủ sở hữu của phiên này' })
+    if (!session) throw new ApiError(StatusCodes.BAD_REQUEST, 'Phiên chơi không tồn tại hoặc đã kết thúc')
+    if (session.address !== address) return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Bạn không phải chủ sở hữu của phiên này' })
 
     const totalTime =session.totalPlayTime + (Date.now() - session.startAt) / 1000
 
-    if (totalTime < PLAY_MIN_TIME || totalTime > PLAY_MAX_TIME)
+    if (totalTime < PLAY_MIN_TIME )
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Thời gian chơi không hợp lệ')
     const result = await miningService.create({ address, score })
     miningGoldCache.del(sessionId)
@@ -87,10 +87,18 @@ const getRestTimes = async (req, res, next) => {
   } catch (error) { next(error)}
 }
 
+//[GET] /mining/get-message
+const getMessage = async (req, res, next) => {
+  try {
+    const result = await miningService.getMessage(req.params.number)
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) { next(error)}
+}
 export const miningController = {
   startMining,
   pauseMining,
   continueMining,
   submitScore,
-  getRestTimes
+  getRestTimes,
+  getMessage
 }

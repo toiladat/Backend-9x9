@@ -77,7 +77,6 @@ export const EMAIL_HTML = (otpKyc) => `
 </html>
 `
 
-export const PLAY_MIN_TIME = 5
-export const PLAY_MAX_TIME = 60
+export const PLAY_MIN_TIME = 40
 export const MAX_PLAY_TIMES = 9
 export const MINUTES_PER_RECOVERY = 9 * 60 * 1000

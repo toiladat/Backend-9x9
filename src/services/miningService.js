@@ -1,4 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
+import { messageModel } from '~/models/messageModel'
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
 import { recoverRestTimes } from '~/utils/recoverRestTimes'
@@ -45,8 +46,14 @@ const getRestTimes = async (address) => {
   }
 }
 
+const getMessage = async (number) => {
+  try {
+    return await messageModel.getMessage(number)
+  } catch (error) { throw error }
+}
 
 export const miningService = {
   create,
-  getRestTimes
+  getRestTimes,
+  getMessage
 }

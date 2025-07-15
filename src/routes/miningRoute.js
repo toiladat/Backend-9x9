@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { miningController } from '~/controllers/miningController'
 import { authMiddlewares } from '~/middlewares/authMiddlewares'
 import { playLimit } from '~/middlewares/playLimiterMiddlewares'
-import { userValidation } from '~/validations/userValidation'
+import { miningGoldValidation } from '~/validations/miningGoldValidation'
 const Route = Router()
 Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
 
@@ -83,7 +83,7 @@ Route.route('/start')
  *         description: Lỗi server
  */
 Route.route('/submit')
-  .post(playLimit, userValidation.minningGold, miningController.submitScore)
+  .post(playLimit, miningGoldValidation.minningGold, miningController.submitScore)
 
 /**
  * @swagger
@@ -175,12 +175,12 @@ Route.route('/continue')
  * @swagger
  * /mining/rest-times:
  *   get:
- *     summary: Lấy hạn mức chơi
+ *     summary: Lấy thông tin lượt chơi còn lại và thời gian hồi lượt tiếp theo
  *     tags:
  *       - MINING GOLD
  *     responses:
  *       200:
- *         description: số lượt chơi
+ *         description: Số lượt chơi hiện tại và thời gian hồi lượt
  *         content:
  *           application/json:
  *             schema:
@@ -188,13 +188,55 @@ Route.route('/continue')
  *               properties:
  *                 restTimes:
  *                   type: number
+ *                   description: Số lượt chơi còn lại
  *                   example: 5
  *                 totalTimes:
  *                   type: number
+ *                   description: Tổng lượt tối đa có thể đạt được
  *                   example: 9
+ *                 timeRestore:
+ *                   type: number
+ *                   description: Thời gian còn lại (milliseconds) để hồi 1 lượt tiếp theo
+ *                   example: 19000
+ *                 lastUpdatedTime:
+ *                   type: number
+ *                   description: Timestamp lần cuối cập nhật lượt chơi
+ *                   example: 1721055600000
  *       500:
  *         description: Lỗi server
  */
 Route.route('/rest-times')
   .get(miningController.getRestTimes)
+
+/**
+ * @swagger
+ * /mining/get-message/{number}:
+ *   get:
+ *     summary: Lấy thông điệp với lượt đào vàng tương ứng
+ *     tags:
+ *       - MINING GOLD
+ *     parameters:
+ *       - in: path
+ *         name: number
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           example: 3
+ *         description: Số lượt chơi cần lấy thông điệp
+ *     responses:
+ *       200:
+ *         description: Thông điệp tương ứng với số lượt chơi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 content:
+ *                   type: string
+ *                   example: 'ha ha ha'
+ *       500:
+ *         description: Lỗi server
+ */
+Route.route('/get-message/:number')
+  .get(miningGoldValidation.validNumber, miningController.getMessage)
 export const miningRoute = Route

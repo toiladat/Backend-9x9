@@ -103,31 +103,10 @@ const numerology = async (req, res, next) => {
   }
 }
 
-const minningGold = async (req, res, next) => {
-  const correctCodition = Joi.object({
-    sessionId : Joi.string().required().guid({ version: ['uuidv4'] }).messages({
-      'any.required': 'SessionId là bắt buộc',
-      'string.guid': 'SessionId không đúng định dạng',
-      'string.empty': 'SessionId không được để trống'
-    }),
-    score: Joi.number().integer().min(0).max(500).required().messages({
-      'any.required': 'Điểm là bắt buộc',
-      'number.base': 'Điểm phải là số',
-      'number.integer': 'Điểm phải là số nguyên',
-      'number.min': 'Điểm không được nhỏ hơn 0',
-      'number.max': 'Điểm quá cao, có thể gian lận'
-    })
-  }).strict()
-  try {
-    await correctCodition.validateAsync(req.body, { abortEarly: false })
-    next()
-  } catch (error) { next(error)}
-}
 export const userValidation = {
   createUser,
   login,
   requestkyc,
   verifyKyc,
-  numerology,
-  minningGold
+  numerology
 }
