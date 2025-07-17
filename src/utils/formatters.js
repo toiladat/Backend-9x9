@@ -1,14 +1,21 @@
+import { ethers } from 'ethers'
 
-const slugify = (val) => {
-  if (!val) return ''
-  return String(val)
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9 -]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+export const formatParsedLog = (parsedLog) => {
+  return {
+    eventName: parsedLog.name,
+    eventSignature: parsedLog.signature,
+    eventTopic: parsedLog.topic,
+    args: {
+      buyer: parsedLog.args[0], // address
+      boxId: Number(parsedLog.args[1]), // uint8 → number
+      price: ethers.formatUnits(parsedLog.args[2], 18) // uint256 → ether (string)
+    },
+    fragment: {
+      inputs: parsedLog.fragment.inputs.map(input => ({
+        name: input.name,
+        type: input.type,
+        baseType: input.baseType
+      }))
+    }
+  }
 }
-
-export default slugify

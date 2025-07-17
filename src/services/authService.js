@@ -8,6 +8,7 @@ import crypto from 'crypto'
 const generateNonce = () => {
   return crypto.randomBytes(16).toString('hex')
 }
+
 const login = async (reqBody) => {
   const { address, signature, message } = reqBody
   try {
@@ -82,6 +83,7 @@ const login = async (reqBody) => {
     throw error
   }
 }
+
 const refreshAccessToken = async (refreshToken) => {
   try {
     const decoded = await jwtUtils.verifyToken(
@@ -124,6 +126,7 @@ const refreshAccessToken = async (refreshToken) => {
     throw new ApiError(StatusCodes.UNAUTHORIZED, error.message || 'Refresh token không hợp lệ hoặc đã hết hạn')
   }
 }
+
 const updateRefreshToken = async (data) => {
   try {
     const { address, refreshToken } = data

@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { authController } from '~/controllers/authController'
-import { authMiddlewares } from '~/middlewares/authMiddlewares'
 import { addressValidation } from '~/validations/addressValidation'
 import { userValidation } from '~/validations/userValidation'
 
@@ -47,7 +46,6 @@ const Route = Router()
  */
 Route.route('/nonce/:address')
   .get(addressValidation.isAddressValid, authController.getNonce)
-
 
 /**
  * @swagger
@@ -98,7 +96,6 @@ Route.route('/nonce/:address')
  */
 Route.route('/login')
   .post( userValidation.login, authController.login)
-
 
 /**
  * @swagger

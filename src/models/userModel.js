@@ -1,6 +1,6 @@
 import Joi from 'joi'
 import { GET_DB } from '~/config/mongodb'
-import { ADDRESS_RULE, OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/Validator'
+import { ADDRESS_RULE } from '~/utils/Validator'
 import { ObjectId } from 'mongodb'
 import { MAX_PLAY_TIMES } from '~/utils/constants'
 
@@ -16,10 +16,20 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   restTimes: Joi.number().min(0).max(MAX_PLAY_TIMES).default(MAX_PLAY_TIMES).strict(),
   lastUpdatedTime: Joi.date().timestamp('javascript').default(null),
   // invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
+  inviterChain: Joi.array().items(Joi.string().pattern(ADDRESS_RULE)).max(9).default([]),
   availableMoney: Joi.number().integer().min(0).default(0),
   pendingMoney: Joi.number().integer().min(0).default(0),
-  history: Joi.array()
-    .items(Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE))
+  openBoxHistories: Joi.array()
+    .items(Joi.object({
+      time: Joi.date().timestamp('javascript').required(),
+      invite: Joi.array().items(
+        Joi.object({
+          address: Joi.string().pattern(ADDRESS_RULE).required(),
+          open: Joi.boolean().default(false)
+        })
+      ).max(9).default([])
+    }))
+    .max(9)
     .default([]),
   createdAt: Joi.date().timestamp('javascript').default(Date.now()),
   updatedAt: Joi.date().timestamp('javascript').default(null),
