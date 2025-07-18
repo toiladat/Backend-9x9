@@ -2,23 +2,30 @@ import { StatusCodes } from 'http-status-codes'
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
 
-const openBox = async (transaction) => {
+const openBox = async (address, transaction) => {
   try {
-    const address = transaction.args[0]
     const numbBox = Number(transaction.args[1])
-          // check số box vừa mở xem có khác openBoxHistories.size không nếu thỏa mãn thì add time vào, push thêm 1 object defaul vào openhistory
-    const user =await userModel.findUserByAddress()
-    if (user.openBoxHistories.size() +1 !== numbBox)
+    // check số box vừa mở xem có khác openBoxHistories.size không nếu thỏa mãn thì add time vào, push thêm 1 object defaul vào openhistory
+    // chuyển 1 pending -> available
+    const user =await userModel.findUserByAddress(address)
+    if (user.openBoxHistories.length +1 !== numbBox)
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
-    await userModel.updateUserByAdderss({
-      address,
-      openBoxHistories: [... user.openBoxHistories.push({ time: Date.now() })]
-    })
-      // lúc ký ví là add thêm vào invite người mời ở số box đó
+    await userModel.openBox(address, numbBox)
+    // lúc ký ví là add thêm vào invite người mời ở số box đó
 
-    // cập nhật status là open, từ thằng cha trực tiếp mời trong invitedBy sau đó update cho address vừa mở là true
+    // // cập nhật status là open, từ thằng cha trực tiếp mời trong invitedBy sau đó update cho address vừa mở là true
+    // // cập nhật tiền cho cha trực tiếp 10 u
+    // await userModel.updateInviter(address, user.invitedBy)
 
-    // chia tiền theo cây vinterchain
+    // // chia tiền theo cây vinterchain
+    // // 5 u cho 9 thằng trong inviterChain
+    // const restMoney = 5 - 0.55 * user.inviterChain
+    // await userModel.updateInviterChain(user.inviterChain)
+    // // 10 u cho thằng tầng box ( ví dụ box 3 thì co thằng tầng 3) ( xử lý pending )
+    // await userModel.updateLevelInviter(user.inviterChain[numbBox], numbBox)
+    //     //check neu box nó mở > = box mình đang mở thì cho vào available, còn không thì pending
+    // // 1 u cho hệ thống
+
     return []
   } catch (error) {
     throw error

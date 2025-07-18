@@ -58,15 +58,12 @@ const refreshToken = async (req, res, next) => {
     res.cookie('refreshToken9x9', result.newRefreshToken, options)
     res.cookie('accessToken9x9', result.newAccessToken, options)
 
-    if (process.env.BUILD_MODE === 'dev') {
-      res.status(StatusCodes.OK).json({
-        success: true,
-        accessToken: result.newAccessToken,
-        refreshToken: result.newRefreshToken
-      })
-    } else {
-      res.status(StatusCodes.OK).json({ success: true, accessToken:  result.newAccessToken })
-    }
+    res.status(StatusCodes.OK).json({
+      success: true,
+      accessToken: result.newAccessToken,
+      refreshToken: result.newRefreshToken
+    })
+
   } catch (error) {
     next(error)
   }

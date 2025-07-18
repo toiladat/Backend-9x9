@@ -10,7 +10,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   address: Joi.string().pattern(ADDRESS_RULE).required().trim().strict(),
   nonce: Joi.string().length(32).hex().required(),
   isKyc: Joi.boolean().default(false),
-  name:Joi.string().optional().min(10).max(10).trim().strict(),
+  name: Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
   score: Joi.number().min(0).default(0),
   restTimes: Joi.number().min(0).max(MAX_PLAY_TIMES).default(MAX_PLAY_TIMES).strict(),
@@ -18,24 +18,36 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   // invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
   inviterChain: Joi.array().items(Joi.string().pattern(ADDRESS_RULE)).max(9).default([]),
   availableMoney: Joi.number().integer().min(0).default(0),
-  pendingMoney: Joi.number().integer().min(0).default(0),
+  pendingMoney: Joi.array()
+    .items(
+      Joi.object({
+        level: Joi.number().integer().min(1).max(9).required(),
+        money: Joi.number().integer().min(0).default(0)
+      })
+    )
+    .max(9)
+    .default(Array.from({ length: 9 }, (_, i) => ({
+      level: i + 1,
+      money: 0
+    }))),
   openBoxHistories: Joi.array()
     .items(Joi.object({
       time: Joi.date().timestamp('javascript').required(),
       invite: Joi.array().items(
         Joi.object({
           address: Joi.string().pattern(ADDRESS_RULE).required(),
-          open: Joi.boolean().default(false)
+          open: Joi.boolean().default(false),
+          timestamp: Joi.date().timestamp('javascript').default(Date.now) // Thêm timestamp
         })
       ).max(9).default([])
     }))
     .max(9)
     .default([]),
-  createdAt: Joi.date().timestamp('javascript').default(Date.now()),
+  createdAt: Joi.date().timestamp('javascript').default(Date.now),
   updatedAt: Joi.date().timestamp('javascript').default(null),
-  _destroy:Joi.boolean().default(false),
+  _destroy: Joi.boolean().default(false),
   refreshToken: Joi.string().allow(null).empty('').default(null)
-})
+});
 
 const validateBeforeCreate = async (data) => {
   try {
@@ -121,9 +133,7 @@ const getUsers = async (pagination, filter, options ) => {
   } catch (error) { throw new Error(error)}
 }
 
-
 const updateUserByAdderss = async(data, options = { updateTimestamp: false }) => {
-
   try {
     const updatedData = { ...data }
     if (options.updateTimestamp)
@@ -140,6 +150,162 @@ const updateUserByAdderss = async(data, options = { updateTimestamp: false }) =>
   } catch (error) { throw new Error(error) }
 }
 
+const openBox = async (address, numBox) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
+      { address },
+      [
+        {
+          $set: {
+            // Tìm phần tử pending có level = numBox
+            pendingToTransfer: {
+              $first: {
+                $filter: {
+                  input: '$pendingMoney',
+                  as: 'item',
+                  cond: { $eq: ['$$item.level', numBox] }
+                }
+              }
+            },
+            newPending: {
+              $filter: {
+                input: '$pendingMoney',
+                as: 'item',
+                cond: { $ne: ['$$item.level', numBox] }
+              }
+            }
+          }
+        },
+        {
+          $set: {
+            openBoxHistories: {
+              $concatArrays: [
+                '$openBoxHistories',
+                [{
+                  time: new Date(),
+                  invite: []
+                }]
+              ]
+            },
+            // Cập nhật availableMoney (cộng thêm money từ pending nếu có)
+            availableMoney: {
+              $add: [
+                '$availableMoney',
+                { $ifNull: ['$pendingToTransfer.money', 0] }
+              ]
+            },
+            pendingMoney: '$newPending'
+          }
+        },
+        {
+          $unset: ['pendingToTransfer', 'newPending']
+        }
+      ],
+      { returnDocument: 'after' }
+    )
+
+    return result.value
+  } catch (error) {
+    console.error('Error in openBox:', error)
+    throw error
+  }
+} 
+
+const updateInviter = async ( invitedAddress, addressInviter ) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
+      {
+        address: addressInviter,
+        'openBoxHistories.invite.address': invitedAddress
+      },
+      {
+        $set: {
+          'openBoxHistories.$[].invite.$[inviteEl].open': true
+        },
+        $inc: { availableMoney: 10 }
+      },
+      {
+        arrayFilters: [
+          { 'inviteEl.address': invitedAddress }
+        ],
+        returnDocument: 'after'
+      }
+    )
+    return result.value
+  } catch (error) { throw error}
+}
+
+const updateInviterChain =async (inviters) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).updateMany(
+      { address: { $in: inviters } },
+      { $inc: { availableMoney: 0.55 } }
+    )
+    return result.modifiedCount
+  } catch (error) { throw error}
+}
+
+const updateLevelInviter = async (address, numBox) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+      { address: address },
+      [
+        {
+          $set: {
+            shouldUpdateAvailable: {
+              $or: [
+                { $gte: [{ $size: '$openHistory' }, numBox] },
+                { $eq: [numBox, 1] }
+              ]
+            },
+            availableMoney: {
+              $cond: [
+                '$shouldUpdateAvailable',
+                { $add: ['$availableMoney', 10] },
+                '$availableMoney'
+              ]
+            },
+            pending: {
+              $cond: [
+                { $not: '$shouldUpdateAvailable' },
+                {
+                  $map: {
+                    input: '$pending',
+                    as: 'item',
+                    in: {
+                      $cond: [
+                        { $eq: ['$$item.level', numBox] },
+                        {
+                          level: '$$item.level',
+                          money: { $add: ['$$item.money', 10] }
+                        },
+                        '$$item'
+                      ]
+                    }
+                  }
+                },
+                '$pending'
+              ]
+            }
+          }
+        },
+        {
+          $unset: 'shouldUpdateAvailable'
+        }
+      ],
+      { upsert: false }
+    )
+
+    return {
+      modifiedCount: result.modifiedCount,
+      matchedCount: result.matchedCount
+    }
+  } catch (error) {
+    console.error('Update error:', error)
+    throw error
+  }
+}
+
 
 export const userModel = {
   USER_COLLECTION_NAME,
@@ -150,5 +316,9 @@ export const userModel = {
   findUserByAddress,
   findUserByEmail,
   getUsers,
-  updateUserByAdderss
+  updateUserByAdderss,
+  openBox,
+  updateInviter,
+  updateInviterChain,
+  updateLevelInviter
 }

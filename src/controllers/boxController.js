@@ -8,8 +8,9 @@ import { boxService } from '~/services/boxService'
 const openBox = async (req, res, next ) => {
   try {
     const transaction= req.transaction
+    const address = req.decoded.address
     // check số box vừa mở xem có khác openBoxHistories.size không nếu thỏa mãn thì add time vào, push thêm 1 object defaul vào openhistory
-    const result = await boxService.openBox(transaction)
+    const result = await boxService.openBox(address, transaction)
 
       // lúc ký ví là add thêm vào invite người mời ở số box đó
 

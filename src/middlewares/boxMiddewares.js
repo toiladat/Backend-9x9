@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes'
 import { contractABI } from '~/config/abi'
 import { GET_CONTRACT } from '~/config/contract'
 import ApiError from '~/utils/ApiError'
-import { formatParsedLog } from '~/utils/formatters'
 const validTransaction = async (req, res, next) => {
   try {
     const { address } = req.decoded

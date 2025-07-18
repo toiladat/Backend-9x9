@@ -22,7 +22,7 @@ const create = async( { address, score }) => {
       lastUpdatedTime: Date.now()
     })
     //create mining document
-    const newHistory = await miningHistoriesModel.createHistory({ address: user.address, score })
+    const newHistory = await miningHistoriesModel.createHistory({ address: address, score })
     return await miningHistoriesModel.findOneById(newHistory.insertedId)
   } catch (error) { throw error}}
 
