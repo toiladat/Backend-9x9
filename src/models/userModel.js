@@ -33,6 +33,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   openBoxHistories: Joi.array()
     .items(Joi.object({
       time: Joi.date().timestamp('javascript').required(),
+      open: Joi.boolean().default(false),
       invite: Joi.array().items(
         Joi.object({
           address: Joi.string().pattern(ADDRESS_RULE).required(),
@@ -47,7 +48,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false),
   refreshToken: Joi.string().allow(null).empty('').default(null)
-});
+})
 
 const validateBeforeCreate = async (data) => {
   try {
@@ -106,6 +107,7 @@ const findUserByEmail = async(email) => {
     })
   } catch (error) { new Error(error) }
 }
+
 const getUsers = async (pagination, filter, options ) => {
   try {
     const { limit, page, skip } = pagination
@@ -150,7 +152,12 @@ const updateUserByAdderss = async(data, options = { updateTimestamp: false }) =>
   } catch (error) { throw new Error(error) }
 }
 
+const addInvitedAddress= async () => {
+
+}
+
 const openBox = async (address, numBox) => {
+  //  open => true là xong
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
       { address },
@@ -206,12 +213,11 @@ const openBox = async (address, numBox) => {
 
     return result.value
   } catch (error) {
-    console.error('Error in openBox:', error)
     throw error
   }
-} 
+}
 
-const updateInviter = async ( invitedAddress, addressInviter ) => {
+const transferToDirectInviter = async ( invitedAddress, addressInviter ) => {
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
       {
@@ -235,7 +241,7 @@ const updateInviter = async ( invitedAddress, addressInviter ) => {
   } catch (error) { throw error}
 }
 
-const updateInviterChain =async (inviters) => {
+const transferToInviterChain =async (inviters) => {
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).updateMany(
       { address: { $in: inviters } },
@@ -245,19 +251,23 @@ const updateInviterChain =async (inviters) => {
   } catch (error) { throw error}
 }
 
-const updateLevelInviter = async (address, numBox) => {
+const transferToInviterLevel = async (address, numBox) => {
   try {
+
     const result = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
       { address: address },
       [
         {
           $set: {
             shouldUpdateAvailable: {
-              $or: [
-                { $gte: [{ $size: '$openHistory' }, numBox] },
-                { $eq: [numBox, 1] }
+              $gte: [
+                { $size: '$openBoxHistories' }, numBox // là true thì chuyển về available, ngược lại về ví hệ thống
               ]
-            },
+            }
+          }
+        },
+        {
+          $set: {
             availableMoney: {
               $cond: [
                 '$shouldUpdateAvailable',
@@ -265,12 +275,12 @@ const updateLevelInviter = async (address, numBox) => {
                 '$availableMoney'
               ]
             },
-            pending: {
+            pendingMoney: {
               $cond: [
                 { $not: '$shouldUpdateAvailable' },
                 {
                   $map: {
-                    input: '$pending',
+                    input: '$pendingMoney',
                     as: 'item',
                     in: {
                       $cond: [
@@ -284,13 +294,13 @@ const updateLevelInviter = async (address, numBox) => {
                     }
                   }
                 },
-                '$pending'
+                '$pendingMoney'
               ]
             }
           }
         },
         {
-          $unset: 'shouldUpdateAvailable'
+          $unset: ['shouldUpdateAvailable']
         }
       ],
       { upsert: false }
@@ -299,13 +309,12 @@ const updateLevelInviter = async (address, numBox) => {
     return {
       modifiedCount: result.modifiedCount,
       matchedCount: result.matchedCount
-    }
+    };
   } catch (error) {
     console.error('Update error:', error)
     throw error
   }
 }
-
 
 export const userModel = {
   USER_COLLECTION_NAME,
@@ -318,7 +327,7 @@ export const userModel = {
   getUsers,
   updateUserByAdderss,
   openBox,
-  updateInviter,
-  updateInviterChain,
-  updateLevelInviter
+  transferToDirectInviter,
+  transferToInviterChain,
+  transferToInviterLevel
 }

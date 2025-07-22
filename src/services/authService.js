@@ -24,6 +24,11 @@ const login = async (reqBody) => {
     if (!user) {
       // const invitedByUser = await userModel.findUserByAddress(reqBody.invitedBy)
       // if (!invitedByUser) throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
+
+      //check xem openBoxHistories.lenght = mấy và sau đó tìm invite.lenght = mấy, để cho user vào invite của người mời luôn
+      // fill dần
+
+      
       const createdUser = await userModel.createUser({
         address,
         nonce: generateNonce(),

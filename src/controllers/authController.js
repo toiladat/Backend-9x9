@@ -81,6 +81,7 @@ const logout = async (req, res, next) => {
     }
     res.clearCookie('authData', options)
     res.clearCookie('refreshToken9x9', options)
+    res.clearCookie('accessToken9x9', options)
     res.status(StatusCodes.OK).json({ success:true })
   } catch (error) { next(error)}
 }

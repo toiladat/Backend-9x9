@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import { contractABI } from '~/config/abi'
 import { GET_CONTRACT } from '~/config/contract'
 import ApiError from '~/utils/ApiError'
+import { formatParsedLog } from '~/utils/formatters'
 const validTransaction = async (req, res, next) => {
   try {
     const { address } = req.decoded
@@ -20,7 +21,7 @@ const validTransaction = async (req, res, next) => {
     const parsedLog = iface.parseLog(targetLog)
 
     if ( parsedLog.args[0].toLowerCase() !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
-    req.transaction = parsedLog
+    req.transaction = formatParsedLog(parsedLog)
     next()
   } catch (error) {
     next(error)

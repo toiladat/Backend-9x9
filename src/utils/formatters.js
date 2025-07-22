@@ -7,7 +7,7 @@ export const formatParsedLog = (parsedLog) => {
     eventTopic: parsedLog.topic,
     args: {
       buyer: parsedLog.args[0], // address
-      boxId: Number(parsedLog.args[1]), // uint8 → number
+      numBox: Number(parsedLog.args[1]), // uint8 → number
       price: ethers.formatUnits(parsedLog.args[2], 18) // uint256 → ether (string)
     },
     fragment: {
