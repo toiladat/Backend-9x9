@@ -15,36 +15,22 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   score: Joi.number().min(0).default(0),
   restTimes: Joi.number().min(0).max(MAX_PLAY_TIMES).default(MAX_PLAY_TIMES).strict(),
   lastUpdatedTime: Joi.date().timestamp('javascript').default(null),
-  // invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
+  invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
   inviterChain: Joi.array().items(Joi.string().pattern(ADDRESS_RULE)).max(9).default([]),
-  availableMoney: Joi.number().integer().min(0).default(0),
-  pendingMoney: Joi.array()
-    .items(
-      Joi.object({
-        level: Joi.number().integer().min(1).max(9).required(),
-        money: Joi.number().integer().min(0).default(0)
-      })
-    )
-    .max(9)
-    .default(Array.from({ length: 9 }, (_, i) => ({
-      level: i + 1,
-      money: 0
-    }))),
+  amount: Joi.number().integer().min(0).default(0),
   openBoxHistories: Joi.array()
     .items(Joi.object({
-      time: Joi.date().timestamp('javascript').required(),
-      open: Joi.boolean().default(false),
-      invite: Joi.array().items(
-        Joi.object({
-          address: Joi.string().pattern(ADDRESS_RULE).required(),
-          open: Joi.boolean().default(false),
-          timestamp: Joi.date().timestamp('javascript').default(Date.now) // Thêm timestamp
-        })
-      ).max(9).default([])
+      boxNumber: Joi.number().integer().min(1).max(9).required(),
+      time: Joi.date().timestamp('javascript').required().default(null),
+      open: Joi.boolean().default(false)
     }))
     .max(9)
-    .default([]),
-  createdAt: Joi.date().timestamp('javascript').default(Date.now),
+    .default(Array.from({ length: 9 }, (_, i) => ({
+      boxNumber: i + 1,
+      time:null,
+      open:false
+    }))),
+  createdAt: Joi.date().timestamp('javascript').default(new Date()),
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false),
   refreshToken: Joi.string().allow(null).empty('').default(null)
@@ -88,7 +74,6 @@ const getUser = async(id) => {
     return result
   } catch (error) { new Error(error)}
 }
-
 
 const findUserByAddress = async (address) => {
   try {
@@ -152,65 +137,26 @@ const updateUserByAdderss = async(data, options = { updateTimestamp: false }) =>
   } catch (error) { throw new Error(error) }
 }
 
-const addInvitedAddress= async () => {
 
-}
-
-const openBox = async (address, numBox) => {
-  //  open => true là xong
+const openBox = async (address, boxNumber) => {
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
-      { address },
-      [
-        {
-          $set: {
-            // Tìm phần tử pending có level = numBox
-            pendingToTransfer: {
-              $first: {
-                $filter: {
-                  input: '$pendingMoney',
-                  as: 'item',
-                  cond: { $eq: ['$$item.level', numBox] }
-                }
-              }
-            },
-            newPending: {
-              $filter: {
-                input: '$pendingMoney',
-                as: 'item',
-                cond: { $ne: ['$$item.level', numBox] }
-              }
-            }
-          }
-        },
-        {
-          $set: {
-            openBoxHistories: {
-              $concatArrays: [
-                '$openBoxHistories',
-                [{
-                  time: new Date(),
-                  invite: []
-                }]
-              ]
-            },
-            // Cập nhật availableMoney (cộng thêm money từ pending nếu có)
-            availableMoney: {
-              $add: [
-                '$availableMoney',
-                { $ifNull: ['$pendingToTransfer.money', 0] }
-              ]
-            },
-            pendingMoney: '$newPending'
-          }
-        },
-        {
-          $unset: ['pendingToTransfer', 'newPending']
+      {
+        address: address
+      },
+      {
+        $set: {
+          'openBoxHistories.$[history].open': true,
+          'openBoxHistories.$[history].time': new Date()
         }
-      ],
-      { returnDocument: 'after' }
+      },
+      {
+        arrayFilters: [
+          { 'history.boxNumber': boxNumber }
+        ],
+        returnDocument: 'after'
+      }
     )
-
     return result.value
   } catch (error) {
     throw error
@@ -221,19 +167,12 @@ const transferToDirectInviter = async ( invitedAddress, addressInviter ) => {
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
       {
-        address: addressInviter,
-        'openBoxHistories.invite.address': invitedAddress
+        address: addressInviter
       },
       {
-        $set: {
-          'openBoxHistories.$[].invite.$[inviteEl].open': true
-        },
-        $inc: { availableMoney: 10 }
+        $inc: { amount: 10 }
       },
       {
-        arrayFilters: [
-          { 'inviteEl.address': invitedAddress }
-        ],
         returnDocument: 'after'
       }
     )
@@ -245,75 +184,51 @@ const transferToInviterChain =async (inviters) => {
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).updateMany(
       { address: { $in: inviters } },
-      { $inc: { availableMoney: 0.55 } }
+      { $inc: { amount: 0.55 } }
     )
     return result.modifiedCount
   } catch (error) { throw error}
 }
 
-const transferToInviterLevel = async (address, numBox) => {
+const transferToInviterLevel = async (inviterAddress, boxNumber) => {
   try {
 
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
-      { address: address },
-      [
-        {
-          $set: {
-            shouldUpdateAvailable: {
-              $gte: [
-                { $size: '$openBoxHistories' }, numBox // là true thì chuyển về available, ngược lại về ví hệ thống
-              ]
-            }
-          }
-        },
-        {
-          $set: {
-            availableMoney: {
-              $cond: [
-                '$shouldUpdateAvailable',
-                { $add: ['$availableMoney', 10] },
-                '$availableMoney'
-              ]
-            },
-            pendingMoney: {
-              $cond: [
-                { $not: '$shouldUpdateAvailable' },
-                {
-                  $map: {
-                    input: '$pendingMoney',
-                    as: 'item',
-                    in: {
-                      $cond: [
-                        { $eq: ['$$item.level', numBox] },
-                        {
-                          level: '$$item.level',
-                          money: { $add: ['$$item.money', 10] }
-                        },
-                        '$$item'
-                      ]
-                    }
-                  }
-                },
-                '$pendingMoney'
-              ]
-            }
-          }
-        },
-        {
-          $unset: ['shouldUpdateAvailable']
-        }
-      ],
-      { upsert: false }
+    const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne(
+      { address: inviterAddress },
+      { projection: { openBoxHistories: 1 } }
     )
+    const shouldUpdateAvailable = user?.openBoxHistories?.find(
+      history => history.boxNumber === boxNumber && history.open === true
+    )
+    let inviterWallet, systemWallet
 
+    if (shouldUpdateAvailable) {
+      inviterWallet = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+        { address: inviterAddress },
+        { $inc: { amount: 10 } }
+      )
+    } else {
+      systemWallet = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+        { address: 'addressSysem' },
+        { $inc: { amount: 10 } }
+      )
+    }
     return {
-      modifiedCount: result.modifiedCount,
-      matchedCount: result.matchedCount
-    };
-  } catch (error) {
-    console.error('Update error:', error)
-    throw error
-  }
+      userModified: inviterWallet?.modifiedCount || 0,
+      systemModified: systemWallet?.modifiedCount || 0,
+      shouldUpdateAvailable
+    }
+  } catch (error) { throw error }
+}
+
+const transferToSystemWallet = async (restMoney) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+      { address: 'addressSystem' },
+      { $inc: { amount: 1 + restMoney } }
+    )
+    return result.modifiedCount
+  } catch (error) { throw error }
 }
 
 export const userModel = {
@@ -329,5 +244,6 @@ export const userModel = {
   openBox,
   transferToDirectInviter,
   transferToInviterChain,
-  transferToInviterLevel
+  transferToInviterLevel,
+  transferToSystemWallet
 }

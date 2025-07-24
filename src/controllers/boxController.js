@@ -1,5 +1,10 @@
 import { boxService } from '~/services/boxService'
 
+// [POST] /box/approve
+const approve = async (req, res, next) => {
+    // chia tiền ở đây
+}
+// [POST] /box/open
 const openBox = async (req, res, next ) => {
   try {
     const transaction= req.transaction
@@ -14,5 +19,6 @@ const openBox = async (req, res, next ) => {
 }
 
 export const boxController = {
-  openBox
+  openBox,
+  approve
 }

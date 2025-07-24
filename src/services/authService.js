@@ -12,44 +12,33 @@ const generateNonce = () => {
 const login = async (reqBody) => {
   const { address, signature, message } = reqBody
   try {
-    // Verify signature
+
     const recoveredAddress = ethers.verifyMessage(message, signature)
     if (recoveredAddress.toLowerCase() !== address.toLowerCase()) {
       throw new ApiError(StatusCodes.UNAUTHORIZED, 'Chữ ký không khớp với thông điệp')
     }
 
-    // Check exist user and update nonce
     let user = await userModel.findUserByAddress(address)
 
     if (!user) {
-      // const invitedByUser = await userModel.findUserByAddress(reqBody.invitedBy)
-      // if (!invitedByUser) throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
+      const inviter = await userModel.findUserByAddress('0xc30a8e1ad70acd22c6350ba9d74e09f05574f672')
+      if (!inviter) throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
 
-      //check xem openBoxHistories.lenght = mấy và sau đó tìm invite.lenght = mấy, để cho user vào invite của người mời luôn
-      // fill dần
-
-      
       const createdUser = await userModel.createUser({
         address,
-        nonce: generateNonce(),
-        // invitedBy: invitedByUser.address,
-        refreshToken: null
+        invitedBy: inviter.address,
+        refreshToken: null,
+        inviterChain: [
+          ...(inviter?.invitedBy ? [inviter.invitedBy] : []),
+          ...inviter.inviterChain.slice(0, 8)
+        ]
       })
-
       user = await userModel.findOneById(createdUser.insertedId)
-    } else {
-      // Existing user - verify nonce
-      if (user.nonce !== message) {
-        throw new ApiError(StatusCodes.UNAUTHORIZED, 'Thông điệp không hợp lệ')
-      }
-      // Update nonce after each login for security
-      await userModel.updateUserByAdderss({
-        address,
-        nonce: generateNonce()
-      })
+    }
+    if (user.nonce !== message) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Vui lòng ký trên thông điệp mới nhất')
     }
 
-    // Prepare token payload
     const tokenPayload = {
       address: user.address,
       isKyc: user.isKyc || false
@@ -68,9 +57,9 @@ const login = async (reqBody) => {
       process.env.REFRESH_TOKEN_LIFE || '7d'
     )
 
-    // Lưu refresh token vào database để có thể revoke sau này
     await userModel.updateUserByAdderss({
       address:user.address,
+      nonce: generateNonce(),
       refreshToken
     })
 
@@ -78,8 +67,7 @@ const login = async (reqBody) => {
       user: {
         _id: user._id,
         address: user.address,
-        isKyc: user.isKyc,
-        nonce: user.nonce // Client cần nonce mới cho lần login tiếp theo
+        isKyc: user.isKyc
       },
       accessToken,
       refreshToken

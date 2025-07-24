@@ -19,7 +19,6 @@ export const getNonce = async (req, res, next) => {
 const login = async (req, res, next) => {
   try {
     const result = await authService.login(req.body)
-    // Set HTTP-only secure cookie for refresh token
 
     res.cookie('refreshToken9x9', result.refreshToken, {
       httpOnly: true,
@@ -28,7 +27,6 @@ const login = async (req, res, next) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     })
 
-    // Trả về thông tin user và access token (không trả về refresh token)
     res.status(StatusCodes.OK).json({
       user: result.user,
       accessToken: result.accessToken
@@ -40,7 +38,6 @@ const login = async (req, res, next) => {
 //[POST] /auth/refresh
 const refreshToken = async (req, res, next) => {
   try {
-    // Nhận refresh token từ cookie hoặc body
     const refreshToken = req.body.refreshToken
 
     if (!refreshToken) {

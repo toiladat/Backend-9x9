@@ -74,6 +74,9 @@ Route.route('/nonce/:address')
  *               message:
  *                 type: string
  *                 example: "72268d709ece62067ed1cf95a53ad5be"
+ *               invitedBy:
+ *                 type: string
+ *                 example: "0xd01498c3178d75ee69271ea62ad13e8c523e8038"
  *     responses:
  *       200:
  *         description: Đăng nhập thành công, trả về access token

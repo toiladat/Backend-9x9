@@ -18,15 +18,42 @@ const validTransaction = async (req, res, next) => {
     const targetLog = receipt.logs.find(
       log => log.address.toLowerCase() === contractAddress.toLowerCase()
     )
-    const parsedLog = iface.parseLog(targetLog)
+    if (!targetLog) throw new ApiError(StatusCodes.BAD_REQUEST, 'Contract không khớp')
 
+    const parsedLog = iface.parseLog(targetLog)
     if ( parsedLog.args[0].toLowerCase() !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
     req.transaction = formatParsedLog(parsedLog)
     next()
-  } catch (error) {
-    next(error)
-  }
+  } catch (error) { next(error) }
 }
-export const boxMiddewares ={
-  validTransaction
+
+const validTransactionApprove = async (req, res, next) => {
+  try {
+    const { address } = req.decoded
+    const { txHash, boxNumber } = req.body
+    const { provider } = await GET_CONTRACT()
+
+    const receipt = await provider.getTransactionReceipt(txHash)
+    if ( receipt.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
+    const contractAddress = process.env.CONTRACT_MUSDT_ADDRESS
+    const targetLog = receipt.logs.find(
+      log => log.address.toLowerCase() === contractAddress.toLowerCase()
+    )
+    if (!targetLog) throw new ApiError(StatusCodes.BAD_REQUEST, 'Contract USDT không khớp')
+    const addressParseLog = '0x'+ targetLog.topics[1].slice(26)
+    if ( addressParseLog !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
+
+    const formatReceipt = {
+      address,
+      amount: Number(ethers.formatUnits(targetLog.data, 6)),
+      boxNumber: boxNumber
+    }
+    return res.json( formatReceipt)
+    // req.transaction = formatReceipt
+  } catch (error) { next(error) }
+}
+
+export const boxMiddewares = {
+  validTransaction,
+  validTransactionApprove
 }

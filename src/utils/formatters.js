@@ -7,15 +7,8 @@ export const formatParsedLog = (parsedLog) => {
     eventTopic: parsedLog.topic,
     args: {
       buyer: parsedLog.args[0], // address
-      numBox: Number(parsedLog.args[1]), // uint8 → number
-      price: ethers.formatUnits(parsedLog.args[2], 18) // uint256 → ether (string)
-    },
-    fragment: {
-      inputs: parsedLog.fragment.inputs.map(input => ({
-        name: input.name,
-        type: input.type,
-        baseType: input.baseType
-      }))
+      boxNumber: Number(parsedLog.args[1]), // uint8 → number
+      price: Number(ethers.formatUnits(parsedLog.args[3][0], 6)) // uint256 → ether (string)
     }
   }
 }
