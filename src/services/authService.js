@@ -20,10 +20,6 @@ const login = async (reqBody) => {
 
     let user = await userModel.findUserByAddress(address)
 
-    if (user?.nonce !== message) {
-      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Vui lòng ký trên thông điệp mới nhất')
-    }
-
     if (!user) {
       const inviter = await userModel.findUserByAddress('0xc30a8e1ad70acd22c6350ba9d74e09f05574f672')
 
@@ -40,7 +36,9 @@ const login = async (reqBody) => {
       })
       user = await userModel.findOneById(createdUser.insertedId)
     }
-
+    else if (user?.nonce !== message) {
+      throw new ApiError(StatusCodes.UNAUTHORIZED, 'Vui lòng ký trên thông điệp mới nhất')
+    }
 
     const tokenPayload = {
       address: user.address,
