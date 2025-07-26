@@ -88,5 +88,5 @@ Route.route('/approve')
  *         description: Lỗi server
  */
 Route.route('/open')
-  .post(boxMiddewares.validTransaction, boxController.openBox)
+  .post(boxMiddewares.validTransactionOpenBox, boxController.openBox)
 export const boxRoute = Route

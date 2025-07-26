@@ -16,7 +16,7 @@ export const CONNECT_CONTRACT = async () => {
       contractABI,
       provider
     )
-    signer = new ethers.Wallet(process.env.PRIVATE_KEY, provider)
+    signer = new ethers.Wallet(process.env.OWNER_CONTRACT_KEY, provider)
     contractWrite = contractRead.connect(signer)
     console.log('Kết nối thành công tới Smart Contract')
   } catch (error) {

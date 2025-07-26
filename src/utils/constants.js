@@ -80,3 +80,10 @@ export const EMAIL_HTML = (otpKyc) => `
 export const PLAY_MIN_TIME = 40
 export const MAX_PLAY_TIMES = 9
 export const MINUTES_PER_RECOVERY = 9 * 60 * 1000
+
+export const OPEN_BOX_AMOUNT= 26
+export const DIRECTED_AMOUNT = 10
+export const DISTRIBUTED_LEVEL_AMOUNT = 10
+export const SYSTEM_AMOUNT = 1
+export const DISTRIBUTED_EVEN_AMOUNT = 5
+export const DISTRIBUTE_PER_USER = 0.55

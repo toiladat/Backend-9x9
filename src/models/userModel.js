@@ -17,7 +17,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   lastUpdatedTime: Joi.date().timestamp('javascript').default(null),
   invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
   inviterChain: Joi.array().items(Joi.string().pattern(ADDRESS_RULE)).max(9).default([]),
-  amount: Joi.number().integer().min(0).default(0),
+  amount: Joi.number().min(0).default(0),
   openBoxHistories: Joi.array()
     .items(Joi.object({
       boxNumber: Joi.number().integer().min(1).max(9).required(),
@@ -170,7 +170,7 @@ const transferToDirectInviter = async ( invitedAddress, addressInviter ) => {
         address: addressInviter
       },
       {
-        $inc: { amount: 10 }
+        $inc: { amount: 10.55 }
       },
       {
         returnDocument: 'after'
@@ -231,6 +231,26 @@ const transferToSystemWallet = async (restMoney) => {
   } catch (error) { throw error }
 }
 
+const findDistributedUser = async (inviterAddress, boxNumber) => {
+  try {
+    const db = GET_DB().collection(USER_COLLECTION_NAME)
+    const addressToCheck = inviterAddress
+
+    const user = await db.findOne(
+      { address: addressToCheck },
+      { projection: { openBoxHistories: 1, address: 1 } }
+    )
+    const isBoxOpened = user?.openBoxHistories?.some(
+      history => history.boxNumber === boxNumber && history.open === true
+    )
+
+    return isBoxOpened ? user : { address: process.env.SYSTEM_ADDRESS }
+  } catch (error) {
+    throw error
+  }
+}
+
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -245,5 +265,6 @@ export const userModel = {
   transferToDirectInviter,
   transferToInviterChain,
   transferToInviterLevel,
-  transferToSystemWallet
+  transferToSystemWallet,
+  findDistributedUser
 }
