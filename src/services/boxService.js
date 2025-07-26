@@ -9,9 +9,9 @@ const approve = async (transaction) => {
     const address = transaction.address
     const user =await userModel.findUserByAddress(address)
 
-    const box = user.openBoxHistories.find(history => history.open == false)
-    if (box.boxNumber!=boxNumber)
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
+    // const box = user.openBoxHistories.find(history => history.open == false)
+    // if (box.boxNumber!=boxNumber)
+    //   throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
 
     // 10 U phân phối
     const distributedUser = await userModel.findDistributedUser(user.inviterChain[boxNumber - 1], boxNumber)
