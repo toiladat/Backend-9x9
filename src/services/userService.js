@@ -77,7 +77,9 @@ const getUsers = async (pagination, filter, options) => {
 
 const getMe = async (address) => {
   try {
-    return await userModel.findUserByAddress(address)
+    const result = await userModel.findUserByAddress(address)
+    delete result.resfreshToken
+    return result
   } catch (error) { throw error}
 }
 export const userService = {
