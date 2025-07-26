@@ -10,16 +10,17 @@ const approve = async (req, res, next) => {
     const transaction = req.transaction
     const result = await boxService.approve(transaction)
     const { addresses, amounts } = extractAddressesAndAmounts(result)
-
-    const messageHash = ethers.solidityPackedKeccak256(
+    const encoded = ethers.AbiCoder.defaultAbiCoder().encode(
       ['address', 'uint8', 'address[]', 'uint256[]'],
       [transaction.address, transaction.boxNumber, addresses, amounts]
     )
+    const messageHash =ethers.keccak256(encoded)
     const { signer } = await GET_CONTRACT()
     const signature = await signer.signMessage(ethers.getBytes(messageHash))
     res.status(StatusCodes.OK).json({
       signature,
-      messageHash
+      addresses,
+      amounts
     })
 
   } catch (error) { next(error)}

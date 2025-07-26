@@ -7,10 +7,9 @@ export const extractAddressesAndAmounts= (obj) => {
   const handleEntry = (entry) => {
     if (entry?.address && typeof entry.amount === 'number') {
       addresses.push(ethers.getAddress(entry.address))
-      amounts.push(BigInt(Math.floor(entry.amount * 1e6)))
+      amounts.push(entry.amount * 1e6)
     }
   }
-
   for (const key in obj) {
     const value = obj[key]
     if (Array.isArray(value)) {

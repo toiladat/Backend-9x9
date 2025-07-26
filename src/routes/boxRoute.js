@@ -26,12 +26,9 @@ Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
  *               txHash:
  *                 type: string
  *                 example: "0xc30a8e1ad70acd22c6350ba9d74e09f05574f672"
- *               boxNumber:
- *                 type: number
- *                 example: 2
  *     responses:
  *       200:
- *         description: trả về địa chỉ và amount phân phối 26 U
+ *         description: trả về mã hash chứa addresses, amounts
  *         content:
  *           application/json:
  *             schema:
