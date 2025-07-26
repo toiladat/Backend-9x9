@@ -99,9 +99,17 @@ const getUsers = async (req, res, next) => {
   } catch (error) { next(error) }
 }
 
+//[GET]/user/get-me
+const getMe = async(req, res, next) => {
+  try {
+    return await userService.getMe(req.decoded.address)
+  } catch (error) { next(error)}
+}
+
 export const userController = {
   requestKyc,
   verifyKyc,
   resendOtp,
-  getUsers
+  getUsers,
+  getMe
 }

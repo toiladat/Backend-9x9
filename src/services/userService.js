@@ -75,11 +75,17 @@ const getUsers = async (pagination, filter, options) => {
   } catch (error) { throw error}
 }
 
+const getMe = async (address) => {
+  try {
+    return await userModel.findUserByAddress(address)
+  } catch (error) { throw error}
+}
 export const userService = {
   createNew,
   updateUserByAddress,
   checkExistEmail,
   verifyKyc,
   requestKyc,
-  getUsers
+  getUsers,
+  getMe
 }

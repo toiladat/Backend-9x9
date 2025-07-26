@@ -195,4 +195,41 @@ Route.route('/resend-otp')
  */
 Route.route('/ranking')
   .get(authMiddlewares.isKyc, paginationMiddleware, userController.getUsers)
+
+/**
+ * @swagger
+ * /user/get-me:
+ *   get:
+ *     summary: Lấy thông tin user
+ *     tags:
+ *       - USER
+ *     responses:
+ *       200:
+ *         description: Thông tin user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 restTimes:
+ *                   type: number
+ *                   description: Số lượt chơi còn lại
+ *                   example: 5
+ *                 totalTimes:
+ *                   type: number
+ *                   description: Tổng lượt tối đa có thể đạt được
+ *                   example: 9
+ *                 timeRestore:
+ *                   type: number
+ *                   description: Thời gian còn lại (milliseconds) để hồi 1 lượt tiếp theo
+ *                   example: 19000
+ *                 lastUpdatedTime:
+ *                   type: number
+ *                   description: Timestamp lần cuối cập nhật lượt chơi
+ *                   example: 1721055600000
+ *       500:
+ *         description: Lỗi server
+ */
+Route.route('/get-me')
+  .get(authMiddlewares.isKyc, userController.getMe)
 export const userRoute = Route

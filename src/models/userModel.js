@@ -10,7 +10,6 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   address: Joi.string().pattern(ADDRESS_RULE).required().trim().strict(),
   nonce: Joi.string().length(32).hex(),
   isKyc: Joi.boolean().default(false),
-  name: Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
   score: Joi.number().min(0).default(0),
   restTimes: Joi.number().min(0).max(MAX_PLAY_TIMES).default(MAX_PLAY_TIMES).strict(),
@@ -80,7 +79,9 @@ const findUserByAddress = async (address) => {
     return await GET_DB().collection(USER_COLLECTION_NAME).findOne({
       address:address,
       _destroy:false
-    })
+    },
+    { projection: { refreshToken: 0, _destroy: 0 } }
+    )
   } catch (error) { new Error(error) }
 }
 
