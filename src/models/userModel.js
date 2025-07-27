@@ -3,7 +3,6 @@ import { GET_DB } from '~/config/mongodb'
 import { ADDRESS_RULE } from '~/utils/Validator'
 import { ObjectId } from 'mongodb'
 import { MAX_PLAY_TIMES } from '~/utils/constants'
-import { DESC_BOX } from '~/utils/constants'
 const USER_COLLECTION_NAME = 'users'
 
 const USER_COLLECTION_SCHEMA = Joi.object({
@@ -28,8 +27,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     .default(Array.from({ length: 9 }, (_, i) => ({
       boxNumber: i + 1,
       time:null,
-      open:false,
-      description: DESC_BOX[i]
+      open:false
     }))),
   createdAt: Joi.date().timestamp('javascript').default(new Date()),
   updatedAt: Joi.date().timestamp('javascript').default(null),

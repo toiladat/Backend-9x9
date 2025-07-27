@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
 import { userModel } from '~/models/userModel'
-import { EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
+import { DESC_BOX, EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
 import slugify from '~/utils/formatters'
 import sendVerificationEmail from '~/utils/mailer'
 import { jwtUtils } from '~/utils/jwt'
@@ -80,6 +80,11 @@ const getMe = async (address) => {
     const result = await userModel.findUserByAddress(address)
     delete result.refreshToken
     delete result.nonce
+    result.openBoxHistories = result.openBoxHistories.map((history, idx) => ({
+      ...history,
+      description: DESC_BOX[idx],
+      title: `Hộp ${idx+1}`
+    }))
     return result
   } catch (error) { throw error}
 }
