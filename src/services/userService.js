@@ -80,8 +80,6 @@ const getMe = async (address) => {
     const result = await userModel.findUserByAddress(address)
     delete result.refreshToken
     delete result.nonce
-    result.openBoxHistories = result.openBoxHistories.filter(history => history.open)
-    result.openedBox = result.openBoxHistories.length
     return result
   } catch (error) { throw error}
 }

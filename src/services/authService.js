@@ -21,7 +21,7 @@ const login = async (reqBody) => {
     let user = await userModel.findUserByAddress(address)
 
     if (!user) {
-      const inviter = await userModel.findUserByAddress(reqBody?.invitedBy)
+      const inviter = await userModel.findUserByAddress(reqBody?.invitedBy.toLowerCase())
 
       if (!inviter) throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
 
