@@ -85,6 +85,7 @@ const getMe = async (address) => {
       description: DESC_BOX[idx],
       title: `Hộp ${idx+1}`
     }))
+    result.currentBox = result.openBoxHistories.filter(history => history.open).length + 1
     return result
   } catch (error) { throw error}
 }
