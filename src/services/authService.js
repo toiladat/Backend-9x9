@@ -26,7 +26,7 @@ const login = async (reqBody) => {
       if (!inviter) throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
 
       const createdUser = await userModel.createUser({
-        address,
+        address:address.toLowerCase(),
         invitedBy: inviter.address,
         refreshToken: null,
         inviterChain: [

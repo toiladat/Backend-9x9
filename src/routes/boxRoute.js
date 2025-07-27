@@ -74,8 +74,8 @@ Route.route('/approve')
  *             schema:
  *               type: object
  *               properties:
- *                 address:
- *                   type: string
+ *                 success:
+ *                   type: boolean
  *                 boxNumber:
  *                   type: number
  *                   example: 2

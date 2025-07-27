@@ -9,9 +9,9 @@ const approve = async (transaction) => {
     const address = transaction.address
     const user =await userModel.findUserByAddress(address)
 
-    // const box = user.openBoxHistories.find(history => history.open == false)
-    // if (box.boxNumber!=boxNumber)
-    //   throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
+    const box = user.openBoxHistories.find(history => history.open == false)
+    if (box.boxNumber!=boxNumber)
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
 
     // 10 U phân phối
     const distributedUser = await userModel.findDistributedUser(user.inviterChain[boxNumber - 1], boxNumber)
@@ -40,22 +40,17 @@ const approve = async (transaction) => {
 
 const openBox = async ( transaction) => {
   try {
-    const boxNumber = transaction.args.boxNumber
-    const address = transaction.args.buyer
-    const user =await userModel.findUserByAddress(address)
+    const { opener, boxNumber, rewards } = transaction
+    const user = await userModel.findUserByAddress(opener)
 
     const box = user.openBoxHistories.find(history => history.open == false)
     if (box.boxNumber!=boxNumber)
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
-    await userModel.openBox(address, boxNumber)
+    const updatedUser = await userModel.openBox(opener, boxNumber)
 
-    await userModel.transferToDirectInviter(address, user.invitedBy)
-
-    const restMoney = 5 - 0.55- 0.55 * user.inviterChain.slice(0, 8).length
-    await userModel.transferToInviterChain(user.inviterChain)
-    await userModel.transferToInviterLevel(user.inviterChain[boxNumber - 1], boxNumber)
-    await userModel.transferToSystemWallet(restMoney)
-    return []
+    const receivers = rewards.filter(reward => reward.address != process.env.SYSTEM_ADDRESS)
+    await userModel.distributeAmounts(receivers)
+    return updatedUser
   } catch (error) { throw error }
 }
 

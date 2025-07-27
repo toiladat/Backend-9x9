@@ -30,11 +30,9 @@ const approve = async (req, res, next) => {
 const openBox = async (req, res, next ) => {
   try {
     const transaction= req.transaction
-    // check số box vừa mở xem có khác openBoxHistories.size không nếu thỏa mãn thì add time vào, push thêm 1 object defaul vào openhistory
     const result = await boxService.openBox( transaction)
-    res.json({
-      transaction
-    })
+    const boxNumber = result.openBoxHistories.filter(history => history.open).length
+    res.status(StatusCodes.OK).json({ success: true, boxNumber })
   } catch (error) { next(error)}
 }
 

@@ -78,7 +78,7 @@ const getUser = async(id) => {
 const findUserByAddress = async (address) => {
   try {
     return await GET_DB().collection(USER_COLLECTION_NAME).findOne({
-      address:address,
+      address:address.toLowerCase(),
       _destroy:false
     })
   } catch (error) { new Error(error) }
@@ -137,7 +137,6 @@ const updateUserByAdderss = async(data, options = { updateTimestamp: false }) =>
   } catch (error) { throw new Error(error) }
 }
 
-
 const openBox = async (address, boxNumber) => {
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
@@ -157,99 +156,27 @@ const openBox = async (address, boxNumber) => {
         returnDocument: 'after'
       }
     )
-    return result.value
+    return result
   } catch (error) {
     throw error
   }
 }
 
-const transferToDirectInviter = async ( invitedAddress, addressInviter ) => {
+const distributeAmounts = async (receivers) => {
   try {
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
-      {
-        address: addressInviter
-      },
-      {
-        $inc: { amount: 10.55 }
-      },
-      {
-        returnDocument: 'after'
+    const operations = receivers.map(({ address, amount }) => ({
+      updateOne: {
+        filter: { address },
+        update: { $inc: { amount } }
       }
-    )
-    return result.value
-  } catch (error) { throw error}
-}
+    }))
 
-const transferToInviterChain =async (inviters) => {
-  try {
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).updateMany(
-      { address: { $in: inviters } },
-      { $inc: { amount: 0.55 } }
-    )
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).bulkWrite(operations)
     return result.modifiedCount
-  } catch (error) { throw error}
-}
-
-const transferToInviterLevel = async (inviterAddress, boxNumber) => {
-  try {
-
-    const user = await GET_DB().collection(USER_COLLECTION_NAME).findOne(
-      { address: inviterAddress },
-      { projection: { openBoxHistories: 1 } }
-    )
-    const shouldUpdateAvailable = user?.openBoxHistories?.find(
-      history => history.boxNumber === boxNumber && history.open === true
-    )
-    let inviterWallet, systemWallet
-
-    if (shouldUpdateAvailable) {
-      inviterWallet = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
-        { address: inviterAddress },
-        { $inc: { amount: 10 } }
-      )
-    } else {
-      systemWallet = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
-        { address: 'addressSysem' },
-        { $inc: { amount: 10 } }
-      )
-    }
-    return {
-      userModified: inviterWallet?.modifiedCount || 0,
-      systemModified: systemWallet?.modifiedCount || 0,
-      shouldUpdateAvailable
-    }
-  } catch (error) { throw error }
-}
-
-const transferToSystemWallet = async (restMoney) => {
-  try {
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
-      { address: 'addressSystem' },
-      { $inc: { amount: 1 + restMoney } }
-    )
-    return result.modifiedCount
-  } catch (error) { throw error }
-}
-
-const findDistributedUser = async (inviterAddress, boxNumber) => {
-  try {
-    const db = GET_DB().collection(USER_COLLECTION_NAME)
-    const addressToCheck = inviterAddress
-
-    const user = await db.findOne(
-      { address: addressToCheck },
-      { projection: { openBoxHistories: 1, address: 1 } }
-    )
-    const isBoxOpened = user?.openBoxHistories?.some(
-      history => history.boxNumber === boxNumber && history.open === true
-    )
-
-    return isBoxOpened ? user : { address: process.env.SYSTEM_ADDRESS }
   } catch (error) {
     throw error
   }
 }
-
 
 export const userModel = {
   USER_COLLECTION_NAME,
@@ -262,9 +189,5 @@ export const userModel = {
   getUsers,
   updateUserByAdderss,
   openBox,
-  transferToDirectInviter,
-  transferToInviterChain,
-  transferToInviterLevel,
-  transferToSystemWallet,
-  findDistributedUser
+  distributeAmounts
 }
