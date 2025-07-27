@@ -76,6 +76,18 @@ export const EMAIL_HTML = (otpKyc) => `
 </body>
 </html>
 `
+export const DESC_BOX = [
+  'Sao thức tỉnh',
+  'Sao gieo hạt',
+  'Sao mở lòng',
+  'Sao kết nối',
+  'Sao phản chiếu',
+  'Sao dẫn lối',
+  'Sao khai sáng',
+  'Sao rộng mở',
+  'Sao kiến tạo'
+]
+
 
 export const PLAY_MIN_TIME = 40
 export const MAX_PLAY_TIMES = 9
