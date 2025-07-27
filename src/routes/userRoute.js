@@ -211,22 +211,71 @@ Route.route('/ranking')
  *             schema:
  *               type: object
  *               properties:
+ *                 _id:
+ *                   type: string
+ *                   example: "6881b26c179b056a3c07d7ba"
+ *                 address:
+ *                   type: string
+ *                   example: "0xd01498c3178d75ee69271ea62ad13e8c523e8038"
+ *                 invitedBy:
+ *                   type: string
+ *                   example: "0xc30a8e1ad70acd22c6350ba9d74e09f05574f672"
+ *                 inviterChain:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   example:
+ *                     - "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"
+ *                     - "0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2"
+ *                 isKyc:
+ *                   type: boolean
+ *                   example: true
+ *                 score:
+ *                   type: number
+ *                   example: 0
  *                 restTimes:
  *                   type: number
- *                   description: Số lượt chơi còn lại
- *                   example: 5
- *                 totalTimes:
- *                   type: number
- *                   description: Tổng lượt tối đa có thể đạt được
  *                   example: 9
- *                 timeRestore:
- *                   type: number
- *                   description: Thời gian còn lại (milliseconds) để hồi 1 lượt tiếp theo
- *                   example: 19000
  *                 lastUpdatedTime:
  *                   type: number
- *                   description: Timestamp lần cuối cập nhật lượt chơi
- *                   example: 1721055600000
+ *                   format: timestamp
+ *                   nullable: true
+ *                   example: null
+ *                 amount:
+ *                   type: number
+ *                   example: 0
+ *                 openBoxHistories:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       boxNumber:
+ *                         type: number
+ *                         example: 1
+ *                       time:
+ *                         type: string
+ *                         format: date-time
+ *                         nullable: true
+ *                         example: "2025-07-24T04:31:11.407Z"
+ *                       open:
+ *                         type: boolean
+ *                         example: false
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *                   example: "2025-07-24T04:10:53.669Z"
+ *                 updatedAt:
+ *                   type: string
+ *                   format: date-time
+ *                   nullable: true
+ *                   example: null
+ *                 _destroy:
+ *                   type: boolean
+ *                   example: false
+ *                 openedBox:
+ *                   type: number
+ *                   description: Số box đã mở
+ *                   example: 0
  *       500:
  *         description: Lỗi server
  */

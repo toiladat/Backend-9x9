@@ -102,7 +102,8 @@ const getUsers = async (req, res, next) => {
 //[GET]/user/get-me
 const getMe = async(req, res, next) => {
   try {
-    res.status(StatusCodes.OK).json(await userService.getMe(req.decoded.address))
+    const result = await userService.getMe(req.decoded.address)
+    res.status(StatusCodes.OK).json(result)
   } catch (error) { next(error)}
 }
 

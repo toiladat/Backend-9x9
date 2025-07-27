@@ -78,7 +78,10 @@ const getUsers = async (pagination, filter, options) => {
 const getMe = async (address) => {
   try {
     const result = await userModel.findUserByAddress(address)
-    delete result.resfreshToken
+    delete result.refreshToken
+    delete result.nonce
+    result.openBoxHistories = result.openBoxHistories.filter(history => history.open)
+    result.openedBox = result.openBoxHistories.length
     return result
   } catch (error) { throw error}
 }
