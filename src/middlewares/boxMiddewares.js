@@ -35,11 +35,14 @@ const validTransactionApprove = async (req, res, next) => {
 
 const validTransactionOpenBox = async (req, res, next) => {
   try {
+
     const { address } = req.decoded
     const { txHash } = req.body
+    console.log('🚀 ~ boxMiddewares.js:41 ~ validTransactionOpenBox ~ txHash:', txHash)
     const { provider } = await GET_CONTRACT()
 
     const receipt = await provider.getTransactionReceipt(txHash)
+    console.log('🚀 ~ boxMiddewares.js:43 ~ validTransactionOpenBox ~ receipt:', receipt)
     const iface = new ethers.Interface(contractABI)
 
     if ( receipt.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
@@ -51,10 +54,13 @@ const validTransactionOpenBox = async (req, res, next) => {
 
     const parsedLog = iface.parseLog(targetLog)
 
-    // if ( parsedLog.args[0].toLowerCase() !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
+    if ( parsedLog.args[0].toLowerCase() !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
     req.transaction = formatParsedLog(parsedLog, 6)
     next()
-  } catch (error) { next(error) }
+  } catch (error) {
+    console.log(error);
+    
+     next(error) }
 }
 
 export const boxMiddewares = {
