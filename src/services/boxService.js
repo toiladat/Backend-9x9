@@ -32,7 +32,7 @@ const approve = async (transaction) => {
       },
       system: {
         address: process.env.SYSTEM_ADDRESS,
-        amount: SYSTEM_AMOUNT + DISTRIBUTED_EVEN_AMOUNT- (user.inviterChain.length * DISTRIBUTE_PER_USER)
+        amount: SYSTEM_AMOUNT + DISTRIBUTED_EVEN_AMOUNT- (user.inviterChain.length * DISTRIBUTE_PER_USER).toFixed(2)
       }
     }
   } catch (error) { throw error}
