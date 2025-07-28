@@ -38,11 +38,9 @@ const validTransactionOpenBox = async (req, res, next) => {
 
     const { address } = req.decoded
     const { txHash } = req.body
-    console.log('🚀 ~ boxMiddewares.js:41 ~ validTransactionOpenBox ~ txHash:', txHash)
     const { provider } = await GET_CONTRACT()
 
     const receipt = await provider.getTransactionReceipt(txHash)
-    console.log('🚀 ~ boxMiddewares.js:43 ~ validTransactionOpenBox ~ receipt:', receipt)
     const iface = new ethers.Interface(contractABI)
 
     if ( receipt.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
@@ -58,9 +56,7 @@ const validTransactionOpenBox = async (req, res, next) => {
     req.transaction = formatParsedLog(parsedLog, 6)
     next()
   } catch (error) {
-    console.log(error);
-    
-     next(error) }
+    next(error) }
 }
 
 export const boxMiddewares = {
