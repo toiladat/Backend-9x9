@@ -18,7 +18,7 @@ export const swaggerOptions = {
         description: 'Production server (Render)'
       },
       {
-        url:'https://backend-9x9-v2.onrender.com/',
+        url:'https://backend-9x9-v2.onrender.com/api',
         description: 'Production server_V2 (Render)'
       }
     ],
