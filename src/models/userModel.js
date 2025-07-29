@@ -184,7 +184,7 @@ const findDistributedUser = async (inviterAddress, boxNumber) => {
     const db = GET_DB().collection(USER_COLLECTION_NAME)
 
     const user = await db.findOne(
-      { address: inviterAddress.toLowerCase() },
+      { address: inviterAddress }, // inviterAddress = null trả về ví hệ thống
       { projection: { openBoxHistories: 1, address: 1 } }
     )
     const isBoxOpened = user?.openBoxHistories?.some(

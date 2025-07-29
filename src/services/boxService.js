@@ -6,13 +6,15 @@ import { DIRECTED_AMOUNT_VALUE, DISTRIBUTE_PER_USER, REFERRAL_CHAIN_AMOUNT_VALUE
 const approve = async (transaction) => {
   try {
     const boxNumber = transaction.boxNumber
+    console.log('🚀 ~ boxService.js:9 ~ approve ~ boxNumber:', boxNumber)
     const address = transaction.address
     const user =await userModel.findUserByAddress(address)
 
     const box = user.openBoxHistories.find(history => history.open == false)
     if (box.boxNumber!=boxNumber)
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
-
+    console.log(user.inviterChain);
+    
     // 10 U phân phối
     const distributedUser = await userModel.findDistributedUser(user.inviterChain[boxNumber - 1], boxNumber)
 
