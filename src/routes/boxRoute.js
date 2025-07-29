@@ -90,6 +90,62 @@ Route.route('/approve')
 Route.route('/open')
   .post(boxMiddewares.validTransactionOpenBox, boxController.openBox)
 
+/**
+ * @swagger
+ * /box/{boxNumber}:
+ *   get:
+ *     summary: Lấy chi tiết box
+ *     tags:
+ *       - BOX
+ *     parameters:
+ *       - in: path
+ *         name: boxNumber
+ *         required: true
+ *         schema:
+ *           type: number
+ *         example: 3
+ *     responses:
+ *       200:
+ *         description: Trả về chi tiết box
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 invitedCount:
+ *                   type: number
+ *                   example: 5
+ *                 boxNumber:
+ *                   type: number
+ *                   example: 3
+ *                 invitedBy:
+ *                   type: string
+ *                   example: "0xabc123..."
+ *                 directedAmount:
+ *                   type: number
+ *                   example: 100
+ *                 distributedAmount:
+ *                   type: number
+ *                   example: 50
+ *                 referralChainAmount:
+ *                   type: number
+ *                   example: 30
+ *                 receivedTotal:
+ *                   type: number
+ *                   example: 180
+ *       400:
+ *         description: Số box không hợp lệ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Box number is not valid"
+ *       500:
+ *         description: Lỗi server
+ */
 Route.route('/:boxNumber')
   .get(boxController.getDetail)
 export const boxRoute = Route

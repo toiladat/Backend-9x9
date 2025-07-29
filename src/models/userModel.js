@@ -202,6 +202,7 @@ const getInvitedUsers = async (address) => {
     return await GET_DB().collection(USER_COLLECTION_NAME).countDocuments({ invitedBy: address.toLowerCase() })
   } catch (error) { throw error}
 }
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
