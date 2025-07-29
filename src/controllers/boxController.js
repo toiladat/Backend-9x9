@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { boxService } from '~/services/boxService'
 import { ethers } from 'ethers'
-import { extractAddressesAndAmounts } from '~/utils/extractAddressesAndAmounts'
+import { extractAddressesAndAmounts } from '~/utils/formatters'
 import { GET_CONTRACT } from '~/config/contract'
 
 // [POST] /box/approve
@@ -36,7 +36,17 @@ const openBox = async (req, res, next ) => {
   } catch (error) { next(error)}
 }
 
+const getDetail = async(req, res, next) => {
+  try {
+    const address = req.decoded.address
+    const boxNumber = req.params.boxNumber
+    const result = await boxService.getDetail({ address, boxNumber })
+    res.status(StatusCodes.OK).json(result)
+  } catch (error) { next(error)}
+}
+
 export const boxController = {
   openBox,
-  approve
+  approve,
+  getDetail
 }

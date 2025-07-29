@@ -89,4 +89,7 @@ Route.route('/approve')
  */
 Route.route('/open')
   .post(boxMiddewares.validTransactionOpenBox, boxController.openBox)
+
+Route.route('/:boxNumber')
+  .get(boxController.getDetail)
 export const boxRoute = Route

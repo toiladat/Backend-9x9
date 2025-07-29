@@ -16,7 +16,9 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   lastUpdatedTime: Joi.date().timestamp('javascript').default(null),
   invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
   inviterChain: Joi.array().items(Joi.string().pattern(ADDRESS_RULE)).max(9).default([]),
-  amount: Joi.number().min(0).default(0),
+  directedAmount: Joi.number().min(0).default(0),
+  referralChainAmount: Joi.number().min(0).default(0),
+  distributedAmount: Joi.number().min(0).default(0),
   openBoxHistories: Joi.array()
     .items(Joi.object({
       boxNumber: Joi.number().integer().min(1).max(9).required(),
@@ -125,7 +127,7 @@ const updateUserByAdderss = async(data, options = { updateTimestamp: false }) =>
     if (options.updateTimestamp)
       updatedData.updatedAt = new Date()
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
-      { address: data.address },
+      { address: data.address.toLowerCase() },
       { $set: updatedData },
       {
         returnDocument: 'after',
@@ -140,7 +142,7 @@ const openBox = async (address, boxNumber) => {
   try {
     const result = await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
       {
-        address: address
+        address: address.toLowerCase()
       },
       {
         $set: {
@@ -163,10 +165,10 @@ const openBox = async (address, boxNumber) => {
 
 const distributeAmounts = async (receivers) => {
   try {
-    const operations = receivers.map(({ address, amount }) => ({
+    const operations = receivers.map(({ address, amount, type }) => ({
       updateOne: {
-        filter: { address },
-        update: { $inc: { amount } }
+        filter: { address: address.toLowerCase() },
+        update: { $inc: { [type] : amount } }
       }
     }))
 
@@ -180,10 +182,9 @@ const distributeAmounts = async (receivers) => {
 const findDistributedUser = async (inviterAddress, boxNumber) => {
   try {
     const db = GET_DB().collection(USER_COLLECTION_NAME)
-    const addressToCheck = inviterAddress
 
     const user = await db.findOne(
-      { address: addressToCheck },
+      { address: inviterAddress.toLowerCase() },
       { projection: { openBoxHistories: 1, address: 1 } }
     )
     const isBoxOpened = user?.openBoxHistories?.some(
@@ -196,6 +197,11 @@ const findDistributedUser = async (inviterAddress, boxNumber) => {
   }
 }
 
+const getInvitedUsers = async (address) => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).countDocuments({ invitedBy: address.toLowerCase() })
+  } catch (error) { throw error}
+}
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -208,5 +214,6 @@ export const userModel = {
   updateUserByAdderss,
   openBox,
   distributeAmounts,
-  findDistributedUser
+  findDistributedUser,
+  getInvitedUsers
 }

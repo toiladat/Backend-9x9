@@ -94,8 +94,13 @@ export const MAX_PLAY_TIMES = 9
 export const MINUTES_PER_RECOVERY = 9 * 60 * 1000
 
 export const OPEN_BOX_AMOUNT= 26
-export const DIRECTED_AMOUNT = 10
-export const DISTRIBUTED_LEVEL_AMOUNT = 10
-export const SYSTEM_AMOUNT = 1
-export const DISTRIBUTED_EVEN_AMOUNT = 5
 export const DISTRIBUTE_PER_USER = 0.55
+export const DIRECTED_AMOUNT_VALUE = 10
+export const DISTRIBUTED_AMOUNT_VALUE = 10
+export const SYSTEM_AMOUNT_VALUE = 1
+export const REFERRAL_CHAIN_AMOUNT_VALUE = 5
+
+export const DIRECTED_AMOUNT_TYPE = 'directedAmount'
+export const DISTRIBUTED_AMOUNT_TYPE = 'distributedAmount'
+export const SYSTEM_AMOUNT_TYPE = 'systemAmount'
+export const REFERRAL_CHAIN_AMOUNT_TYPE = 'referralChainAmount'

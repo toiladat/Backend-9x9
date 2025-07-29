@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
-import { DIRECTED_AMOUNT, DISTRIBUTE_PER_USER, DISTRIBUTED_EVEN_AMOUNT, DISTRIBUTED_LEVEL_AMOUNT, SYSTEM_AMOUNT } from '~/utils/constants'
+import { DIRECTED_AMOUNT_VALUE, DISTRIBUTE_PER_USER, REFERRAL_CHAIN_AMOUNT_VALUE , DISTRIBUTED_AMOUNT_VALUE , SYSTEM_AMOUNT_VALUE  } from '~/utils/constants'
 
 const approve = async (transaction) => {
   try {
@@ -19,7 +19,7 @@ const approve = async (transaction) => {
     return {
       invitedBy: {
         address: user.invitedBy,
-        amount: DIRECTED_AMOUNT
+        amount: DIRECTED_AMOUNT_VALUE
       },
       inviterChain: [
         ...(
@@ -28,11 +28,11 @@ const approve = async (transaction) => {
       ],
       distributedLevelUser: {
         address: distributedUser.address,
-        amount: DISTRIBUTED_LEVEL_AMOUNT
+        amount: DISTRIBUTED_AMOUNT_VALUE
       },
       system: {
         address: process.env.SYSTEM_ADDRESS,
-        amount: SYSTEM_AMOUNT + DISTRIBUTED_EVEN_AMOUNT- (user.inviterChain.length * DISTRIBUTE_PER_USER).toFixed(2)
+        amount: SYSTEM_AMOUNT_VALUE + REFERRAL_CHAIN_AMOUNT_VALUE - (user.inviterChain.length * DISTRIBUTE_PER_USER).toFixed(2)
       }
     }
   } catch (error) { throw error}
@@ -54,7 +54,25 @@ const openBox = async ( transaction) => {
   } catch (error) { throw error }
 }
 
+const getDetail = async (data) => {
+  try {
+    const user = await userModel.findUserByAddress(data.address)
+    const invitedCount = await userModel.getInvitedUsers(user.address)
+    const result = {
+      invitedCount,
+      boxNumber:user.openBoxHistories.filter(history => history.open).length,
+      invitedBy: user.invitedBy,
+      directedAmount: user.directedAmount,
+      distributedAmount: user.distributedAmount,
+      referralChainAmount:user.referralChainAmount,
+      receivedTotal : user.directedAmount + user.distributedAmount + user.referralChainAmount
+    }
+    return result
+  } catch (error) { throw error}
+}
+
 export const boxService = {
   openBox,
-  approve
+  approve,
+  getDetail
 }

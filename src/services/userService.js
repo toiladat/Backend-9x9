@@ -86,6 +86,7 @@ const getMe = async (address) => {
       title: `Hộp ${idx+1}`
     }))
     result.currentBox = result.openBoxHistories.filter(history => history.open).length + 1
+    result.amount = result.directedAmount + result.referralChainAmount + result.distributedAmount
     return result
   } catch (error) { throw error}
 }
