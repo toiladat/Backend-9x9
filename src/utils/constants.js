@@ -1,7 +1,8 @@
 export const WHITELIST_DOMAINS = [
   'http://localhost:3000',
   'https://backend-9x9.onrender.com',
-  'https://gasy-9x9-plus-fe.vercel.app'
+  'https://gasy-9x9-plus-fe.vercel.app',
+  'https://backend-9x9-v2.onrender.com'
 ]
 
 export const EMAIL_SUBJECT = 'Xác nhận KYC'
