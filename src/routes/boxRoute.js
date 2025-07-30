@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { boxController } from '~/controllers/boxController'
 import { authMiddlewares } from '~/middlewares/authMiddlewares'
 import { boxMiddewares } from '~/middlewares/boxMiddewares'
+import { pagination } from '~/utils/pagination'
 const Route = Router()
 
 Route.use(authMiddlewares.auth, authMiddlewares.isKyc)
@@ -148,4 +149,70 @@ Route.route('/open')
  */
 Route.route('/:boxNumber')
   .get(boxController.getDetail)
+
+/**
+ * @swagger
+ * /box/tree:
+ *   post:
+ *     summary: Lấy cây ref
+ *     tags:
+ *       - BOX
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - address
+ *               - limit
+ *               - page
+ *             properties:
+ *               address:
+ *                 type: string
+ *                 example: "0x584ef09005ffc6fd51558"
+ *               limit:
+ *                 type: number
+ *                 example: 10
+ *               page:
+ *                 type: number
+ *                 example: 1
+ *     responses:
+*       200:
+ *         description: địa chỉ ví và phân trang
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       address:
+ *                         type: string
+ *                         example: "0xabc123..."
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     totalItems:
+ *                       type: integer
+ *                       example: 100
+ *                     limit:
+ *                       type: integer
+ *                       example: 15
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     pageTotal:
+ *                       type: integer
+ *                       example: 10
+ *       500:
+ *         description: Lỗi server
+ */
+Route.route('/tree')
+  .post( pagination, boxController.getTree)
+
 export const boxRoute = Route
+

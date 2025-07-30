@@ -3,6 +3,7 @@ import { boxService } from '~/services/boxService'
 import { ethers } from 'ethers'
 import { extractAddressesAndAmounts } from '~/utils/formatters'
 import { GET_CONTRACT } from '~/config/contract'
+import { userService } from '~/services/userService'
 
 // [POST] /box/approve
 const approve = async (req, res, next) => {
@@ -36,6 +37,7 @@ const openBox = async (req, res, next ) => {
   } catch (error) { next(error)}
 }
 
+// [GET] /box/:boxNumber
 const getDetail = async(req, res, next) => {
   try {
     const address = req.decoded.address
@@ -45,8 +47,22 @@ const getDetail = async(req, res, next) => {
   } catch (error) { next(error)}
 }
 
+// [POST] /box/tree
+const getTree = async (req, res, next) => {
+  try {
+    const address = req.body.address|| req.decoded.address
+    const filter = { invitedBy: address, _destroy: false }
+    const options = { projection: { address: 1 } }
+    const result = await userService.getUsers(req.pagination, filter, options)
+    res.status(StatusCodes.OK).json({
+      result
+    })
+  } catch (error) { next(error)}
+}
+
 export const boxController = {
   openBox,
   approve,
-  getDetail
+  getDetail,
+  getTree
 }
