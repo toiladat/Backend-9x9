@@ -90,6 +90,7 @@ const getMe = async (address) => {
     return result
   } catch (error) { throw error}
 }
+
 export const userService = {
   createNew,
   updateUserByAddress,

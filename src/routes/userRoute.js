@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { userController } from '~/controllers/userController'
 import { authMiddlewares } from '~/middlewares/authMiddlewares'
-import { paginationMiddleware } from '~/utils/pagination'
+import { pagination } from '~/utils/pagination'
 import { userValidation } from '~/validations/userValidation'
 
 const Route = Router()
@@ -194,7 +194,7 @@ Route.route('/resend-otp')
  *         description: Lỗi server
  */
 Route.route('/ranking')
-  .get(authMiddlewares.isKyc, paginationMiddleware, userController.getUsers)
+  .get(authMiddlewares.isKyc, pagination, userController.getUsers)
 
 /**
  * @swagger

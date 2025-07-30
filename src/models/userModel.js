@@ -63,18 +63,6 @@ const findOneById = async(id) => {
   } catch (error) { new Error(error)}
 }
 
-const getUser = async(id) => {
-  try {
-
-    //aggreate collection
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).findOne({
-      _id: new ObjectId(id),
-      _destroy:false
-    })
-
-    return result
-  } catch (error) { new Error(error)}
-}
 
 const findUserByAddress = async (address) => {
   try {
@@ -99,7 +87,7 @@ const getUsers = async (pagination, filter, options ) => {
     const { limit, page, skip } = pagination
 
     const db = GET_DB().collection(USER_COLLECTION_NAME)
-    const totalItems = await db.countDocuments({ _destroy: false })
+    const totalItems = await db.countDocuments(filter)
     const users = await db.find(
       filter,
       options
@@ -203,12 +191,15 @@ const getInvitedUsers = async (address) => {
   } catch (error) { throw error}
 }
 
+const getRefTree = async(data) => {
+
+}
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
   createUser,
   findOneById,
-  getUser,
   findUserByAddress,
   findUserByEmail,
   getUsers,
@@ -216,5 +207,6 @@ export const userModel = {
   openBox,
   distributeAmounts,
   findDistributedUser,
-  getInvitedUsers
+  getInvitedUsers,
+  getRefTree
 }
