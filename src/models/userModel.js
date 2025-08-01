@@ -220,6 +220,18 @@ const getInvitedUsers = async (address) => {
   } catch (error) { throw error}
 }
 
+const filterValidReferalAddress = async (addresses, boxNumber) => {
+  try {
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).find({
+      address: { $in: addresses },
+      openBoxHistories: { $elemMatch: {
+        boxNumber: boxNumber,
+        open: true
+      } }
+    }).toArray
+    return result
+  } catch (error) { throw error}
+}
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -233,4 +245,5 @@ export const userModel = {
   distributeAmounts,
   findDistributedUser,
   getInvitedUsers,
+  filterValidReferalAddress
 }

@@ -47,10 +47,10 @@ const getDetail = async(req, res, next) => {
   } catch (error) { next(error)}
 }
 
-// [POST] /box/tree
+// [GET] /box/tree
 const getTree = async (req, res, next) => {
   try {
-    const address = req.body.address|| req.decoded.address
+    const address = req.query.address|| req.decoded.address
     const filter = { invitedBy: address, _destroy: false }
     const options = { projection: { address: 1 } }
     const result = await userService.getUsers(req.pagination, filter, options)
