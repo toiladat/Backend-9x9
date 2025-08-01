@@ -14,24 +14,26 @@ const approve = async (transaction) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
     // 10 U phân phối
     const distributedUser = await userModel.findDistributedUser(user.inviterChain[boxNumber - 1], boxNumber)
+    const referalChain = [
+      { address: user.invitedBy, amount: DISTRIBUTE_PER_USER },
+      ...user.inviterChain.slice(0, 8).map(address => ({
+        address,
+        amount: DISTRIBUTE_PER_USER
+      }))]
 
     return {
       invitedBy: {
         address: user.invitedBy,
         amount: DIRECTED_AMOUNT_VALUE
       },
-      inviterChain: [
-        ...(
-          user.inviterChain.map( address => ( { address, amount: DISTRIBUTE_PER_USER } ))
-        )
-      ],
+      inviterChain: referalChain,
       distributedLevelUser: {
         address: distributedUser.address,
         amount: DISTRIBUTED_AMOUNT_VALUE
       },
       system: {
         address: process.env.SYSTEM_ADDRESS,
-        amount: SYSTEM_AMOUNT_VALUE + REFERRAL_CHAIN_AMOUNT_VALUE - (user.inviterChain.length * DISTRIBUTE_PER_USER).toFixed(2)
+        amount: SYSTEM_AMOUNT_VALUE + REFERRAL_CHAIN_AMOUNT_VALUE - (referalChain.length * DISTRIBUTE_PER_USER).toFixed(2)
       }
     }
   } catch (error) { throw error}
