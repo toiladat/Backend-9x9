@@ -20,20 +20,21 @@ const approve = async (transaction) => {
         address,
         amount: DISTRIBUTE_PER_USER
       }))]
+    const validReferalChain = await userModel.filterValidReferalAddress(referalChain, boxNumber)
 
     return {
       invitedBy: {
         address: user.invitedBy,
         amount: DIRECTED_AMOUNT_VALUE
       },
-      inviterChain: referalChain,
+      inviterChain: validReferalChain,
       distributedLevelUser: {
         address: distributedUser.address,
         amount: DISTRIBUTED_AMOUNT_VALUE
       },
       system: {
         address: process.env.SYSTEM_ADDRESS,
-        amount: SYSTEM_AMOUNT_VALUE + REFERRAL_CHAIN_AMOUNT_VALUE - (referalChain.length * DISTRIBUTE_PER_USER).toFixed(2)
+        amount: SYSTEM_AMOUNT_VALUE + REFERRAL_CHAIN_AMOUNT_VALUE - (validReferalChain.length * DISTRIBUTE_PER_USER).toFixed(2)
       }
     }
   } catch (error) { throw error}
