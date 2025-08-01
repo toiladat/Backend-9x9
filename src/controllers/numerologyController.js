@@ -7,7 +7,8 @@ const numerology = async (req, res, next) => {
   try {
     const { birth, name } = req.body
     const number = calculateLifePathNumber(birth)
-    const meaning = await numerologymodel.getMeanings(number)
+    console.log('🚀 ~ numerologyController.js:10 ~ numerology ~ number:', number.mainNumber)
+    const meaning = await numerologymodel.getMeanings(number.mainNumber)
     return res.status(StatusCodes.OK).json({
       name,
       number,

@@ -98,36 +98,7 @@ const getUsers = async (pagination, filter, options ) => {
       .toArray()
     const pageTotal = Math.ceil(totalItems / limit)
     return {
-      users: [
-        {
-          '_id': '6886bee5307611f84a47a843',
-          'address': '0xc30a8e1ad70acd22c6350ba9d74e09f05574f672'
-        },
-        {
-          '_id': '68874bdf307611f84a47a84c',
-          'address': '0x1c2b4b455e62f1d87a78803f41cef96d9b2a6c1b'
-        },
-        {
-          '_id': '6886f5ac307611f84a47a847',
-          'address': '0xd0f72499435bde20dd9cfc132d79195eec30ea67'
-        },
-        {
-          '_id': '6886f748307611f84a47a849',
-          'address': '0xaf243669ace38b64000359946bcc1c414904353b'
-        },
-        {
-          '_id': '6886e703307611f84a47a846',
-          'address': '0xe5ea4dcba832252f33672dc8f4cc2bb0da2d4a16'
-        },
-        {
-          '_id': '6886bcb5307611f84a47a841',
-          'address': '0xd84d8443606698957a743cb62911a2b2d9fccc8b'
-        },
-        {
-          '_id': '6887795171728ce7456120a9',
-          'address': '0x9d7c6080c678dd4ad2b91f7311bb82bb3988fcf9'
-        }
-      ],
+      users: users,
       pagination: {
         totalItems,
         page,

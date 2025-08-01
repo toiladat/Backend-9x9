@@ -4,7 +4,6 @@ import { miningService } from '~/services/miningService'
 import ApiError from '~/utils/ApiError'
 import { miningGoldCache } from '~/utils/cache'
 import { PLAY_MIN_TIME } from '~/utils/constants'
-import { userModel } from '~/models/userModel'
 
 // [POST] /mining/start
 const startMining = async (req, res, next) => {
