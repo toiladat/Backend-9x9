@@ -93,6 +93,72 @@ Route.route('/open')
 
 /**
  * @swagger
+ * /box/tree:
+ *   get:
+ *     summary: Lấy cây ref theo địa chỉ ví
+ *     tags:
+ *       - BOX
+ *     parameters:
+ *       - in: query
+ *         name: address
+ *         required: true
+ *         description: Địa chỉ ví cần lấy cây ref
+ *         schema:
+ *           type: string
+ *           example: "0x584ef09005ffc6fd51558"
+ *       - in: query
+ *         name: limit
+ *         required: true
+ *         description: Số lượng phần tử trên mỗi trang
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *       - in: query
+ *         name: page
+ *         required: true
+ *         description: Số trang cần lấy
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *     responses:
+ *       200:
+ *         description: Danh sách địa chỉ ref và thông tin phân trang
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       address:
+ *                         type: string
+ *                         example: "0xabc123..."
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     totalItems:
+ *                       type: integer
+ *                       example: 100
+ *                     limit:
+ *                       type: integer
+ *                       example: 15
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     pageTotal:
+ *                       type: integer
+ *                       example: 10
+ *       500:
+ *         description: Lỗi server
+ */
+Route.route('/tree')
+  .get(pagination, boxController.getTree)
+
+/**
+ * @swagger
  * /box/{boxNumber}:
  *   get:
  *     summary: Lấy chi tiết box
@@ -149,70 +215,6 @@ Route.route('/open')
  */
 Route.route('/:boxNumber')
   .get(boxController.getDetail)
-
-/**
- * @swagger
- * /box/tree:
- *   post:
- *     summary: Lấy cây ref
- *     tags:
- *       - BOX
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - address
- *               - limit
- *               - page
- *             properties:
- *               address:
- *                 type: string
- *                 example: "0x584ef09005ffc6fd51558"
- *               limit:
- *                 type: number
- *                 example: 10
- *               page:
- *                 type: number
- *                 example: 1
- *     responses:
-*       200:
- *         description: địa chỉ ví và phân trang
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       address:
- *                         type: string
- *                         example: "0xabc123..."
- *                 pagination:
- *                   type: object
- *                   properties:
- *                     totalItems:
- *                       type: integer
- *                       example: 100
- *                     limit:
- *                       type: integer
- *                       example: 15
- *                     page:
- *                       type: integer
- *                       example: 1
- *                     pageTotal:
- *                       type: integer
- *                       example: 10
- *       500:
- *         description: Lỗi server
- */
-Route.route('/tree')
-  .post( pagination, boxController.getTree)
 
 export const boxRoute = Route
 
