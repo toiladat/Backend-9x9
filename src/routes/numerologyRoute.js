@@ -6,7 +6,6 @@ import { numerologyController } from '~/controllers/numerologyController'
 
 const Route = Router()
 Route.use(authMiddlewares.auth)
-
 /**
  * @swagger
  * /numerology/meanings:
@@ -42,29 +41,43 @@ Route.use(authMiddlewares.auth)
  *                   type: string
  *                   example: "Nguyen Van A"
  *                 number:
- *                   type: string
- *                   example: "7"
+ *                   type: object
+ *                   properties:
+ *                     lifePath:
+ *                       type: integer
+ *                       example: 7
+ *                     destiny:
+ *                       type: integer
+ *                       example: 7
+ *                     soul:
+ *                       type: integer
+ *                       example: 2
+ *                     personality:
+ *                       type: integer
+ *                       example: 9
+ *                     body:
+ *                       type: integer
+ *                       example: 5
+ *                     mainNumber:
+ *                       type: integer
+ *                       example: 7
  *                 meaning:
  *                   type: object
  *                   properties:
- *                     mission:
+ *                     description:
  *                       type: string
- *                       example: "Lãnh đạo, độc lập"
- *                     personality:
- *                       type: string
- *                       example: "Quyết đoán, sáng tạo"
- *                     destiny:
- *                       type: string
- *                       example: "Thành công trong sự nghiệp"
- *                     lifePath:
- *                       type: string
- *                       example: "Khám phá bản thân"
- *                     soul:
- *                       type: string
- *                       example: "Đồng cảm và yêu thương"
- *                     body:
- *                       type: string
- *                       example: "Khỏe mạnh và năng động"
+ *                       example: "NGƯỜI TÌM KIẾM CHÂN LÝ"
+ *                     content:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           title:
+ *                             type: string
+ *                             example: "Thông điệp truyền tải"
+ *                           value:
+ *                             type: string
+ *                             example: "Số 7 truyền tải thông điệp về sự khám phá, tìm kiếm sự thật và trí tuệ..."
  *       500:
  *         description: Lỗi server
  */

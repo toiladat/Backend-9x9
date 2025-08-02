@@ -59,6 +59,10 @@ const getTree = async (req, res, next) => {
     })
   } catch (error) { next(error)}
 }
+const tree = {
+  address: '',
+  childrens: []
+}
 
 export const boxController = {
   openBox,
