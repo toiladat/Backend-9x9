@@ -96,7 +96,7 @@ const numerology = async (req, res, next) => {
   }).strict()
 
   try {
-    await correctCodition.validateAsync(req.body, { abortEarly: false })
+    await correctCodition.validateAsync(req.query, { abortEarly: false })
     next()
   } catch (error) {
     next(new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))

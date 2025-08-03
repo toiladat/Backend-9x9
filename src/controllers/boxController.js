@@ -4,6 +4,8 @@ import { ethers } from 'ethers'
 import { extractAddressesAndAmounts } from '~/utils/formatters'
 import { GET_CONTRACT } from '~/config/contract'
 import { userService } from '~/services/userService'
+import { userModel } from '~/models/userModel'
+import ApiError from '~/utils/ApiError'
 
 // [POST] /box/approve
 const approve = async (req, res, next) => {
@@ -51,6 +53,8 @@ const getDetail = async(req, res, next) => {
 const getTree = async (req, res, next) => {
   try {
     const address = req.query.address|| req.decoded.address
+    const user = await userModel.findUserByAddress(address)
+    if (!user) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ không tồn tại')
     const filter = { invitedBy: address, _destroy: false }
     const options = { projection: { address: 1 } }
     const result = await userService.getUsers(req.pagination, filter, options)
@@ -58,10 +62,6 @@ const getTree = async (req, res, next) => {
       result
     })
   } catch (error) { next(error)}
-}
-const tree = {
-  address: '',
-  childrens: []
 }
 
 export const boxController = {

@@ -9,26 +9,23 @@ Route.use(authMiddlewares.auth)
 /**
  * @swagger
  * /numerology/meanings:
- *   post:
+ *   get:
  *     summary: Chơi thần số học
  *     tags:
  *       - NUMEROLOGY
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - name
- *               - birth
- *             properties:
- *               name:
- *                 type: string
- *                 example: "Nguyen Van A"
- *               birth:
- *                 type: string
- *                 example: "02/09/2012"
+ *     parameters:
+ *       - in: query
+ *         name: name
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "Nguyen Van A"
+ *       - in: query
+ *         name: birth
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "02/09/2012"
  *     responses:
  *       200:
  *         description: Trả về số và ý nghĩa con số
@@ -82,6 +79,6 @@ Route.use(authMiddlewares.auth)
  *         description: Lỗi server
  */
 Route.route('/meanings')
-  .post(authMiddlewares.isKyc, userValidation.numerology, numerologyController.numerology)
+  .get(authMiddlewares.isKyc, userValidation.numerology, numerologyController.numerology)
 
 export const numerologyRoute = Route

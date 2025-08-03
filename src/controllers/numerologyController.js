@@ -2,10 +2,10 @@ const { StatusCodes } = require('http-status-codes')
 const { numerologymodel } = require('~/models/numerologyModel')
 const { calculateLifePathNumber } = require('~/utils/caculateDob')
 
-//[POST]/numerology/numerology
+//[GET]/numerology/numerology
 const numerology = async (req, res, next) => {
   try {
-    const { birth, name } = req.body
+    const { birth, name } = req.query
     const number = calculateLifePathNumber(birth)
     const meaning = await numerologymodel.getMeanings(number.mainNumber)
     return res.status(StatusCodes.OK).json({
