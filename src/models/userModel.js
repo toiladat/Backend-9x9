@@ -193,13 +193,18 @@ const getInvitedUsers = async (address) => {
 
 const filterValidReferalAddress = async (addresses, boxNumber) => {
   try {
-    const result = await GET_DB().collection(USER_COLLECTION_NAME).find({
-      address: { $in: addresses },
-      openBoxHistories: { $elemMatch: {
-        boxNumber: boxNumber,
-        open: true
-      } }
-    }).toArray
+    const result = await GET_DB().collection(USER_COLLECTION_NAME).find(
+      {
+        address: { $in: addresses },
+        openBoxHistories: {
+          $elemMatch: {
+            boxNumber: boxNumber,
+            open: true
+          }
+        }
+      },
+      { projection: { address: 1 } }
+    ).toArray()
     return result
   } catch (error) { throw error}
 }
