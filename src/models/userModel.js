@@ -153,6 +153,7 @@ const openBox = async (address, boxNumber) => {
 
 const distributeAmounts = async (receivers) => {
   try {
+    if (receivers.length === 0) return 0
     const operations = receivers.map(({ address, amount, type }) => ({
       updateOne: {
         filter: { address: address.toLowerCase() },
