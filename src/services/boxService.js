@@ -29,7 +29,7 @@ const approve = async (transaction) => {
 
     return {
       invitedBy: {
-        address: user.invitedBy,
+        address: user.invitedBy ||process.env.SYSTEM_ADDRESS,
         amount: DIRECTED_AMOUNT_VALUE
       },
       inviterChain: validReferalChain.map((user) => ({
