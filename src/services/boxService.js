@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
-import { DIRECTED_AMOUNT_VALUE, DISTRIBUTE_PER_USER, REFERRAL_CHAIN_AMOUNT_VALUE , DISTRIBUTED_AMOUNT_VALUE , SYSTEM_AMOUNT_VALUE  } from '~/utils/constants'
+import { DIRECTED_AMOUNT_VALUE, DISTRIBUTE_PER_USER, REFERRAL_CHAIN_AMOUNT_VALUE , DISTRIBUTED_AMOUNT_VALUE , SYSTEM_AMOUNT_VALUE, DESC_BOX  } from '~/utils/constants'
 
 const approve = async (transaction) => {
   try {
@@ -70,6 +70,7 @@ const getDetail = async (data) => {
     const user = await userModel.findUserByAddress(data.address)
     const invitedCount = await userModel.getInvitedUsers(user.address)
     const result = {
+      title: DESC_BOX[data.boxNumber],
       invitedCount,
       boxNumber:user.openBoxHistories.filter(history => history.open).length,
       invitedBy: user.invitedBy,
