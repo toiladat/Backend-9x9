@@ -281,4 +281,7 @@ Route.route('/ranking')
  */
 Route.route('/get-me')
   .get(authMiddlewares.isKyc, userController.getMe)
+
+Route.route('/task')
+  .get(authMiddlewares.isKyc, userController.getTask)
 export const userRoute = Route

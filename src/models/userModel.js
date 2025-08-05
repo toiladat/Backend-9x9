@@ -12,6 +12,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   name: Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
   mainNumber: Joi.number().integer().default(0),
+  continiousLoginDay:Joi.date().timestamp('javascript').default(null),
 
   score: Joi.number().min(0).default(0),
   restTimes: Joi.number().min(0).max(MAX_PLAY_TIMES).default(MAX_PLAY_TIMES).strict(),
@@ -242,6 +243,13 @@ const updateBadge = async (address, badges) => {
   } catch (error) { throw error}
 }
 
+const getRank = async (score) => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).countDocuments({
+      score: { $gt: score }
+    })
+  } catch (error) { throw error}
+}
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -257,5 +265,6 @@ export const userModel = {
   getInvitedUsers,
   filterValidReferalAddress,
   getTopUsersByScore,
-  updateBadge
+  updateBadge,
+  getRank
 }
