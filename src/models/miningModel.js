@@ -27,9 +27,16 @@ const findOneById = async (id) => {
     })
   } catch (error) { throw new Error(error)}
 }
+
+const getMiningCount = async (address) => {
+  try {
+    return await GET_DB().collection(MINING_HISTORY_COLLECTION_NAME).countDocuments({ address })
+  } catch (error) { throw new Error(error)}
+}
 export const miningHistoriesModel = {
   MINING_HISTORY_COLLECTION_NAME,
   MINING_HISTORY_COLLECTION_SCHEMA,
   createHistory,
-  findOneById
+  findOneById,
+  getMiningCount
 }

@@ -11,11 +11,13 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   isKyc: Joi.boolean().default(false),
   name: Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
+  mainNumber: Joi.number().integer().default(0),
 
   score: Joi.number().min(0).default(0),
   restTimes: Joi.number().min(0).max(MAX_PLAY_TIMES).default(MAX_PLAY_TIMES).strict(),
-  lastUpdatedTime: Joi.date().timestamp('javascript').default(null),
-  mainNumber: Joi.number().integer().default(0),
+  lastPlayedTime: Joi.date().timestamp('javascript').default(null),
+  continiousPlayDay: Joi.date().timestamp('javascript').default(null),
+  badges: Joi.array().items(Joi.string()).default([]),
 
   invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
   inviterChain: Joi.array().items(Joi.string().pattern(ADDRESS_RULE)).max(9).default([]),
@@ -213,6 +215,33 @@ const filterValidReferalAddress = async (addresses, boxNumber) => {
     return result
   } catch (error) { throw error}
 }
+
+const getTopUsersByScore = async (topNumber) => {
+  try {
+    const users = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .find({}, { projection: { address: 1, _id: 0 } })
+      .sort({ score: -1 })
+      .limit(topNumber)
+      .toArray()
+
+    return users.map(user => user.address)
+  } catch (error) { throw error }
+}
+
+const updateBadge = async (address, badges) => {
+  try {
+    return GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
+      { address },
+      { $addToSet: { badges: { $each : badges } } },
+      {
+        projection: { badges: 1 },
+        returnDocument: 'after'
+      }
+    )
+  } catch (error) { throw error}
+}
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -226,5 +255,7 @@ export const userModel = {
   distributeAmounts,
   findDistributedUser,
   getInvitedUsers,
-  filterValidReferalAddress
+  filterValidReferalAddress,
+  getTopUsersByScore,
+  updateBadge
 }

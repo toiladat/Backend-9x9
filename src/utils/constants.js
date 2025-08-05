@@ -105,3 +105,14 @@ export const DIRECTED_AMOUNT_TYPE = 'directedAmount'
 export const DISTRIBUTED_AMOUNT_TYPE = 'distributedAmount'
 export const SYSTEM_AMOUNT_TYPE = 'systemAmount'
 export const REFERRAL_CHAIN_AMOUNT_TYPE = 'referralChainAmount'
+
+export const BADGES = {
+  FIRESTARTER: 'NGƯỜI TRUYỀN LỬA',
+  SOWER: 'NGƯỜI GIAO HẠT',
+  GUIDE: 'NGƯỜI DẪN ĐƯỜNG',
+  INSPIRER: 'NGƯỜI TRUYỀN CẢM HỨNG',
+  AMBASSADOR: 'ĐẠI SỨ 9x9 Plus'
+}
+
+export const ONE_YEAR = 365 * 24 * 60 * 60 * 1000
+export const ONE_DAY = 24 * 60 * 60 * 1000

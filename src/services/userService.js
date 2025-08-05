@@ -1,9 +1,9 @@
 /* eslint-disable no-useless-catch */
 import { userModel } from '~/models/userModel'
-import { DESC_BOX, EMAIL_HTML, EMAIL_SUBJECT } from '~/utils/constants'
-import slugify from '~/utils/formatters'
+import { BADGES, DESC_BOX, EMAIL_HTML, EMAIL_SUBJECT, ONE_YEAR } from '~/utils/constants'
 import sendVerificationEmail from '~/utils/mailer'
 import { jwtUtils } from '~/utils/jwt'
+import { miningHistoriesModel } from '~/models/miningModel'
 
 const createNew = async (reqBody) => {
   try {
@@ -15,7 +15,6 @@ const createNew = async (reqBody) => {
     throw error
   }
 }
-
 
 const updateUserByAddress = async (data) => {
   try {
@@ -92,6 +91,47 @@ const getMe = async (address) => {
   } catch (error) { throw error}
 }
 
+const findAndUpdateBadge = async (address) => {
+  try {
+    const user = await userModel.findUserByAddress(address)
+    const badges = []
+    const now = Date.now()
+
+    // 1. Đủ 100 lượt đào vàng
+    const miningCount = await miningHistoriesModel.getMiningCount(address)
+    if (miningCount >= 100 && !user.badges.includes(BADGES.FIRESTARTER)) {
+      badges.push(BADGES.FIRESTARTER)
+    }
+
+    // 2. Đào liên tiếp 21 ngày
+    if (user.continiousPlayDay >= 21 && !user.badges.includes(BADGES.SOWER)) {
+      badges.push(BADGES.SOWER)
+    }
+
+    // 3. Mời được 9 người
+    const invitedCount = await userModel.getInvitedUsers(address)
+    if (invitedCount >= 9 && !user.badges.includes(BADGES.GUIDE)) {
+      badges.push(BADGES.GUIDE)
+    }
+
+    // 4. Trong top 9 điểm cao
+    const topUsers = await userModel.getTopUsersByScore(9)
+    if (topUsers.includes(address) && !user.badges.includes(BADGES.INSPIRER)) {
+      badges.push(BADGES.INSPIRER)
+    }
+
+    // 5. Gắn bó hơn 1 năm
+    const joinTime = new Date(user.createdAt).getTime()
+    if (now - joinTime >= ONE_YEAR && !user.badges.includes(BADGES.AMBASSADOR)) {
+      badges.push(BADGES.AMBASSADOR)
+    }
+
+    return badges.length > 0 ? await userModel.updateBadge(address, badges) : null
+  } catch (error) {
+    throw error
+  }
+}
+
 export const userService = {
   createNew,
   updateUserByAddress,
@@ -99,5 +139,6 @@ export const userService = {
   verifyKyc,
   requestKyc,
   getUsers,
-  getMe
+  getMe,
+  findAndUpdateBadge
 }

@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { messageModel } from '~/models/messageModel'
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
+import { getDayDiff } from '~/utils/getDayDiff'
 import { recoverRestTimes } from '~/utils/recoverRestTimes'
 
 const { miningHistoriesModel } = require('~/models/miningModel')
@@ -13,13 +14,28 @@ const create = async( { address, score }) => {
     if (user.restTimes <= 0) {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Bạn đã hết lượt chơi!')
     }
+    const now = new Date()
+    const lastPlay = new Date(user.lastPlayedTime || now)
+
+    // Tính số ngày chênh lệch
+    const dayDiff = getDayDiff(lastPlay, now)
+    let continiousPlayDay = user.continiousPlayDay || 1
+
+    if (dayDiff === 1) {
+      continiousPlayDay += 1
+    } else if (dayDiff > 1) {
+      continiousPlayDay = 1
+    } else {
+      continiousPlayDay = user.continiousPlayDay || 1
+    }
 
     //Update users collection
     await userModel.updateUserByAdderss({
       address,
       score: score + user.score,
       restTimes: user.restTimes -1,
-      lastUpdatedTime: Date.now()
+      lastPlayedTime: Date.now(),
+      continiousPlayDay
     })
     //create mining document
     const newHistory = await miningHistoriesModel.createHistory({ address: address, score })
@@ -32,12 +48,12 @@ const getRestTimes = async (address) => {
     const recovered = recoverRestTimes(user)
     if (
       recovered.restTimes !== user.restTimes ||
-      new Date(recovered.lastUpdatedTime).getTime() !== new Date(user.lastUpdatedTime).getTime()
+      new Date(recovered.lastPlayedTime).getTime() !== new Date(user.lastPlayedTime).getTime()
     ) {
       await userModel.updateUserByAdderss({
         address,
         restTimes: recovered.restTimes,
-        lastUpdatedTime: recovered.lastUpdatedTime
+        lastPlayedTime: recovered.lastPlayedTime
       })
     }
     return recovered

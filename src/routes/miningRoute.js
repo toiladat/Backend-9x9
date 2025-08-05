@@ -85,6 +85,32 @@ Route.route('/start')
 Route.route('/submit')
   .post(playLimit, miningGoldValidation.minningGold, miningController.submitScore)
 
+
+/**
+ * @swagger
+ * /mining/badge:
+ *   get:
+ *     summary: Lấy huy hiệu
+ *     tags:
+ *       - MINING GOLD
+ *     responses:
+ *       200:
+ *         description: Lấy huy hiệu khi đạt thành tích
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *                 example: 'NGƯỜI TRUYỀN CẢM HỨNG'
+ *       401:
+ *         description: Chưa xác thực hoặc token không hợp lệ
+ *       500:
+ *         description: Lỗi server
+ */
+Route.route('/badge')
+  .get(miningController.getBadge)
+
 /**
  * @swagger
  * /mining/pause:
@@ -198,7 +224,7 @@ Route.route('/continue')
  *                   type: number
  *                   description: Thời gian còn lại (milliseconds) để hồi 1 lượt tiếp theo
  *                   example: 19000
- *                 lastUpdatedTime:
+ *                 lastPlayedTime:
  *                   type: number
  *                   description: Timestamp lần cuối cập nhật lượt chơi
  *                   example: 1721055600000

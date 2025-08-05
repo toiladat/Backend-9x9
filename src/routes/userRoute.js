@@ -236,7 +236,7 @@ Route.route('/ranking')
  *                 restTimes:
  *                   type: number
  *                   example: 9
- *                 lastUpdatedTime:
+ *                 lastPlayedTime:
  *                   type: number
  *                   format: timestamp
  *                   nullable: true

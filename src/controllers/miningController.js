@@ -4,6 +4,7 @@ import { miningService } from '~/services/miningService'
 import ApiError from '~/utils/ApiError'
 import { miningGoldCache } from '~/utils/cache'
 import { PLAY_MIN_TIME } from '~/utils/constants'
+import { userService } from '~/services/userService'
 
 // [POST] /mining/start
 const startMining = async (req, res, next) => {
@@ -72,9 +73,18 @@ const submitScore = async (req, res, next) => {
 
     if (totalTime < PLAY_MIN_TIME )
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Thời gian chơi không hợp lệ')
+
     const result = await miningService.create({ address, score })
     miningGoldCache.del(sessionId)
     res.status(StatusCodes.OK).json(result)
+  } catch (error) { next(error)}
+}
+
+//[GET]//mining/badge
+const getBadge = async (req, res, next) => {
+  try {
+    const badge = await userService.findAndUpdateBadge(req.decoded.address)
+    res.status(StatusCodes.OK).json(badge)
   } catch (error) { next(error)}
 }
 
@@ -99,5 +109,6 @@ export const miningController = {
   continueMining,
   submitScore,
   getRestTimes,
-  getMessage
+  getMessage,
+  getBadge
 }

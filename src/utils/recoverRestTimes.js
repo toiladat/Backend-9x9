@@ -2,7 +2,7 @@ import { MAX_PLAY_TIMES, MINUTES_PER_RECOVERY } from './constants'
 
 export const recoverRestTimes = (user) => {
   const now = Date.now()
-  const lastUpdate = new Date(user.lastUpdatedTime).getTime()
+  const lastUpdate = new Date(user.lastPlayedTime).getTime()
   const elapsed = now - lastUpdate
 
   const recovered = Math.floor(elapsed / MINUTES_PER_RECOVERY)
@@ -14,7 +14,7 @@ export const recoverRestTimes = (user) => {
 
   return {
     restTimes: newRestTimes,
-    lastUpdatedTime: newLastUpdatedTime,
+    lastPlayedTime: newLastUpdatedTime,
     timeRestore,
     totalTimes: MAX_PLAY_TIMES
   }
