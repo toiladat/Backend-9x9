@@ -87,6 +87,7 @@ const getMe = async (address) => {
     }))
     result.currentBox = result.openBoxHistories.filter(history => history.open).length + 1
     result.amount = result.directedAmount + result.referralChainAmount + result.distributedAmount
+    result.invitedCounts = await userModel.getInvitedUsers(address)
     return result
   } catch (error) { throw error}
 }

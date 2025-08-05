@@ -11,9 +11,12 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   isKyc: Joi.boolean().default(false),
   name: Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
+
   score: Joi.number().min(0).default(0),
   restTimes: Joi.number().min(0).max(MAX_PLAY_TIMES).default(MAX_PLAY_TIMES).strict(),
   lastUpdatedTime: Joi.date().timestamp('javascript').default(null),
+  mainNumber: Joi.number().integer().default(0),
+
   invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
   inviterChain: Joi.array().items(Joi.string().pattern(ADDRESS_RULE)).max(9).default([]),
   directedAmount: Joi.number().min(0).default(0),
@@ -31,6 +34,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
       time:null,
       open:false
     }))),
+
   createdAt: Joi.date().timestamp('javascript').default(new Date()),
   updatedAt: Joi.date().timestamp('javascript').default(null),
   _destroy: Joi.boolean().default(false),
