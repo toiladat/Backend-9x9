@@ -200,6 +200,10 @@ Route.route('/tree')
  *                 receivedTotal:
  *                   type: number
  *                   example: 180
+ *                 openTime:
+ *                   type: string
+ *                   format: date-time
+ *                   example:  "2025-08-05T14:00:00Z"
  *       400:
  *         description: Số box không hợp lệ
  *         content:

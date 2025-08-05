@@ -107,10 +107,17 @@ const getMe = async(req, res, next) => {
   } catch (error) { next(error)}
 }
 
+//[GET]/user/task
+const getTask = async(req, res, next) => {
+  try {
+    res.status(StatusCodes.OK).json('ok')
+  } catch (error) { next(error)}
+}
 export const userController = {
   requestKyc,
   verifyKyc,
   resendOtp,
   getUsers,
-  getMe
+  getMe,
+  getTask
 }

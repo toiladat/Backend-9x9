@@ -37,8 +37,8 @@ const START_SERVER = () => {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(getSwaggerSpec()))
 
   if (process.env.BUILD_MODE === 'production' ) {
-    app.listen(process.env.PORT, '0.0.0.0', () => {
-      console.log(`Production. I am running at host :${ port }/`)
+    app.listen(process.env.PORT || 3000, '0.0.0.0', () => {
+      console.log(`Production. I am running at: http://0.0.0.0:${process.env.PORT || 3000}/`)
     })
   } else {
     app.listen(port, hostname, () => {

@@ -276,9 +276,16 @@ Route.route('/ranking')
  *                   type: number
  *                   description: Số box đã mở
  *                   example: 0
+ *                 rank:
+ *                   type: number
+ *                   description: xếp hạng thịnh vượng
+ *                   example: 2
  *       500:
  *         description: Lỗi server
  */
 Route.route('/get-me')
   .get(authMiddlewares.isKyc, userController.getMe)
+
+Route.route('/task')
+  .get(authMiddlewares.isKyc, userController.getTask)
 export const userRoute = Route
