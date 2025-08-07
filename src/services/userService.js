@@ -3,18 +3,7 @@ import { userModel } from '~/models/userModel'
 import { BADGES, DESC_BOX, EMAIL_HTML, EMAIL_SUBJECT, ONE_YEAR } from '~/utils/constants'
 import sendVerificationEmail from '~/utils/mailer'
 import { jwtUtils } from '~/utils/jwt'
-import { miningHistoriesModel } from '~/models/miningModel'
-
-const createNew = async (reqBody) => {
-  try {
-    const createdUser= await userModel.createUser(reqBody)
-    const getNewUser = await userModel.findOneById(createdUser.insertedId)
-    return getNewUser
-  }
-  catch (error) {
-    throw error
-  }
-}
+import { miningHistoriesModel } from '~/models/miningHistoriesModel'
 
 const updateUserByAddress = async (data) => {
   try {
@@ -99,13 +88,13 @@ const findAndUpdateBadge = async (address) => {
     const now = Date.now()
 
     // 1. Đủ 100 lượt đào vàng
-    const miningCount = await miningHistoriesModel.getMiningCount(address)
+    const miningCount = await miningHistoriesModel.getMiningCount({ address })
     if (miningCount >= 100 && !user.badges.includes(BADGES.FIRESTARTER)) {
       badges.push(BADGES.FIRESTARTER)
     }
 
     // 2. Đào liên tiếp 21 ngày
-    if (user.continiousPlayDay >= 21 && !user.badges.includes(BADGES.SOWER)) {
+    if (user.continuousPlayDay >= 21 && !user.badges.includes(BADGES.SOWER)) {
       badges.push(BADGES.SOWER)
     }
 
@@ -134,7 +123,6 @@ const findAndUpdateBadge = async (address) => {
 }
 
 export const userService = {
-  createNew,
   updateUserByAddress,
   checkExistEmail,
   verifyKyc,

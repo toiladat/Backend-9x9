@@ -4,9 +4,25 @@ import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
 import { jwtUtils } from '~/utils/jwt'
 import crypto from 'crypto'
+import { taskModel } from '~/models/taskModel'
+import { getDayDiff } from '~/utils/getDayDiff'
+import { taskService } from './taskService'
 
 const generateNonce = () => {
   return crypto.randomBytes(16).toString('hex')
+}
+
+const updateContinuousLoginDay = async (userAddress) => {
+  const taskOfUser = await taskService.getTask(userAddress)
+  const now = new Date()
+  const latestLoginDay = new Date(taskOfUser.latestLoginDay || now)
+  const dayDiff = getDayDiff(latestLoginDay, now)
+
+  let continuousLoginDay = taskOfUser.continuousLoginDay || 1
+  if (dayDiff === 1) continuousLoginDay += 1
+  else if (dayDiff > 1) continuousLoginDay = 1 //reset lại nếu không liên tục
+
+  await taskService.updateTask({ address: userAddress, continuousLoginDay, latestLoginDay: now })
 }
 
 const login = async (reqBody) => {
@@ -21,24 +37,45 @@ const login = async (reqBody) => {
     let user = await userModel.findUserByAddress(address)
 
     if (!user) {
-      const inviter = await userModel.findUserByAddress(reqBody?.invitedBy?.toLowerCase())
+      const isSystemAddress = address.toLowerCase() === process.env.SYSTEM_ADDRESS
+      // Nếu là ví hệ thống → tạo user đặc biệt
+      if (isSystemAddress) {
+        const createdUser = await userModel.createUser({
+          address: address.toLowerCase(),
+          invitedBy: null,
+          inviterChain: [],
+          refreshToken: null
+        })
 
-      if (!inviter) throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
+        await taskModel.createTask(address.toLowerCase())
+        user = await userModel.findOneById(createdUser.insertedId)
+      } else {
+        let inviter = await userModel.findUserByAddress(reqBody.invitedBy.toLowerCase())
 
-      const createdUser = await userModel.createUser({
-        address:address.toLowerCase(),
-        invitedBy: inviter.address,
-        refreshToken: null,
-        inviterChain: [
-          ...(inviter?.invitedBy ? [inviter.invitedBy] : []),
-          ...inviter.inviterChain.slice(0, 8)
-        ]
-      })
-      user = await userModel.findOneById(createdUser.insertedId)
+        if (!inviter) {
+          throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
+        }
+        const createdUser = await userModel.createUser({
+          address: address.toLowerCase(),
+          invitedBy: inviter.address,
+          refreshToken: null,
+          inviterChain: [
+            ...(inviter?.invitedBy ? [inviter.invitedBy] : []),
+            ...((inviter?.inviterChain || []).slice(0, 8))
+          ]
+        })
+
+        await taskModel.createTask(address.toLowerCase())
+        user = await userModel.findOneById(createdUser.insertedId)
+      }
     }
     else if (user?.nonce !== message) {
       throw new ApiError(StatusCodes.UNAUTHORIZED, 'Vui lòng ký trên thông điệp mới nhất')
     }
+
+
+    // cập nhật ngày đăng nhập liên tiếp
+    await updateContinuousLoginDay(user.address)
 
     const tokenPayload = {
       address: user.address,

@@ -6,6 +6,7 @@ import { numerologyController } from '~/controllers/numerologyController'
 
 const Route = Router()
 Route.use(authMiddlewares.auth)
+
 /**
  * @swagger
  * /numerology/meanings:

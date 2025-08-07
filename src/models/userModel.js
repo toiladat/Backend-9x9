@@ -12,15 +12,17 @@ const USER_COLLECTION_SCHEMA = Joi.object({
   name: Joi.string().optional().min(10).max(10).trim().strict(),
   email: Joi.string().optional().email().trim().strict(),
   mainNumber: Joi.number().integer().default(0),
-  continiousLoginDay:Joi.date().timestamp('javascript').default(null),
 
   score: Joi.number().min(0).default(0),
   restTimes: Joi.number().min(0).max(MAX_PLAY_TIMES).default(MAX_PLAY_TIMES).strict(),
   lastPlayedTime: Joi.date().timestamp('javascript').default(null),
-  continiousPlayDay: Joi.date().timestamp('javascript').default(null),
+  continuousPlayDay: Joi.number().integer().default(0),
   badges: Joi.array().items(Joi.string()).default([]),
 
-  invitedBy: Joi.string().required().pattern(ADDRESS_RULE).trim().strict(),
+  invitedBy: Joi.alternatives().try(
+    Joi.string().pattern(ADDRESS_RULE).trim().strict(),
+    Joi.valid(null)
+  ),
   inviterChain: Joi.array().items(Joi.string().pattern(ADDRESS_RULE)).max(9).default([]),
   directedAmount: Joi.number().min(0).default(0),
   referralChainAmount: Joi.number().min(0).default(0),
@@ -250,6 +252,16 @@ const getRank = async (score) => {
     })
   } catch (error) { throw error}
 }
+
+const grantReward = async ({ address, score }) => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).findOneAndUpdate(
+      { address },
+      { $inc: { score } }
+    )
+  } catch (error) { throw new Error(error) }
+}
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -266,5 +278,6 @@ export const userModel = {
   filterValidReferalAddress,
   getTopUsersByScore,
   updateBadge,
-  getRank
+  getRank,
+  grantReward
 }

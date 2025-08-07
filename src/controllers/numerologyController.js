@@ -1,8 +1,7 @@
 import { userService } from '~/services/userService'
-
-const { StatusCodes } = require('http-status-codes')
-const { numerologymodel } = require('~/models/numerologyModel')
-const { calculateLifePathNumber } = require('~/utils/caculateDob')
+import { StatusCodes } from 'http-status-codes'
+import { numerologymodel } from '~/models/numerologyModel'
+import { calculateLifePathNumber } from '~/utils/caculateDob'
 
 //[GET]/numerology/numerology
 const numerology = async (req, res, next) => {

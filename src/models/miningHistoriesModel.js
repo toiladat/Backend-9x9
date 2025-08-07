@@ -14,12 +14,14 @@ const validateBeforeCreate = async (data) => {
     return await MINING_HISTORY_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
   } catch (error) { throw new Error(error)}
 }
+
 const createHistory = async ( data ) => {
   try {
     const validHistory = await validateBeforeCreate(data)
     return await GET_DB().collection(MINING_HISTORY_COLLECTION_NAME).insertOne(validHistory)
   } catch (error) { throw new Error(error)}
 }
+
 const findOneById = async (id) => {
   try {
     return await GET_DB().collection(MINING_HISTORY_COLLECTION_NAME).findOne({
@@ -28,11 +30,29 @@ const findOneById = async (id) => {
   } catch (error) { throw new Error(error)}
 }
 
-const getMiningCount = async (address) => {
+const getMiningCount = async ({ address, time = null }) => {
   try {
-    return await GET_DB().collection(MINING_HISTORY_COLLECTION_NAME).countDocuments({ address })
-  } catch (error) { throw new Error(error)}
+    let data = { address }
+
+    // lấy theo ngày truyền vào
+    if (time) {
+      const date = new Date(time)
+
+      const startOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+      const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)
+
+      data.startTime = {
+        $gte: startOfDay.getTime(),
+        $lt: endOfDay.getTime()
+      }
+    }
+
+    return await GET_DB().collection(MINING_HISTORY_COLLECTION_NAME).countDocuments(data)
+  } catch (error) {
+    throw new Error(error)
+  }
 }
+
 export const miningHistoriesModel = {
   MINING_HISTORY_COLLECTION_NAME,
   MINING_HISTORY_COLLECTION_SCHEMA,

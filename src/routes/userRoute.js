@@ -106,7 +106,7 @@ Route.route('/verify-kyc')
  *     summary: Cần gửi lại mã qua Email
  *     tags:
  *       - USER
-*     responses:
+ *     responses:
  *       200:
  *         description: Lưu OTP mới và gửi mail thành công
  *         content:
@@ -120,7 +120,7 @@ Route.route('/verify-kyc')
  *       400:
  *         description: Email đã tồn tại hoặc lỗi trong quá trình gửi mail
  *         content:
-  *           application/json:
+ *           application/json:
  *             schema:
  *               type: object
  *               properties:
@@ -286,6 +286,4 @@ Route.route('/ranking')
 Route.route('/get-me')
   .get(authMiddlewares.isKyc, userController.getMe)
 
-Route.route('/task')
-  .get(authMiddlewares.isKyc, userController.getTask)
 export const userRoute = Route

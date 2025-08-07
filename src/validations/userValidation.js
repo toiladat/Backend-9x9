@@ -103,10 +103,22 @@ const numerology = async (req, res, next) => {
   }
 }
 
+const validMissionCompleted = async ( req, res, next) => {
+  try {
+    const correctCodition = Joi.object({
+      shareLink: Joi.boolean().strict(),
+      joinGroup: Joi.boolean().strict(),
+      readTerms: Joi.boolean().strict()
+    })
+    await correctCodition.validateAsync(req.body?.missionCompleted, { abortEarly: false })
+    next()
+  } catch (error) { next( new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))}
+}
 export const userValidation = {
   createUser,
   login,
   requestkyc,
   verifyKyc,
-  numerology
+  numerology,
+  validMissionCompleted
 }

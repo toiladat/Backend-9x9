@@ -5,7 +5,7 @@ import ApiError from '~/utils/ApiError'
 import { getDayDiff } from '~/utils/getDayDiff'
 import { recoverRestTimes } from '~/utils/recoverRestTimes'
 
-const { miningHistoriesModel } = require('~/models/miningModel')
+import { miningHistoriesModel } from '~/models/miningHistoriesModel'
 
 const create = async( { address, score }) => {
   try {
@@ -19,14 +19,12 @@ const create = async( { address, score }) => {
 
     // Tính số ngày chênh lệch
     const dayDiff = getDayDiff(lastPlay, now)
-    let continiousPlayDay = user.continiousPlayDay || 1
+    let continuousPlayDay = user.continuousPlayDay || 1
 
     if (dayDiff === 1) {
-      continiousPlayDay += 1
+      continuousPlayDay += 1
     } else if (dayDiff > 1) {
-      continiousPlayDay = 1
-    } else {
-      continiousPlayDay = user.continiousPlayDay || 1
+      continuousPlayDay = 1
     }
 
     //Update users collection
@@ -35,7 +33,7 @@ const create = async( { address, score }) => {
       score: score + user.score,
       restTimes: user.restTimes -1,
       lastPlayedTime: Date.now(),
-      continiousPlayDay
+      continuousPlayDay
     })
     //create mining document
     const newHistory = await miningHistoriesModel.createHistory({ address: address, score })

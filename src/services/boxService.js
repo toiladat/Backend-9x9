@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
-import { DIRECTED_AMOUNT_VALUE, DISTRIBUTE_PER_USER, REFERRAL_CHAIN_AMOUNT_VALUE, DISTRIBUTED_AMOUNT_VALUE, SYSTEM_AMOUNT_VALUE, DESC_BOX  } from '~/utils/constants'
+import { DIRECTED_AMOUNT_VALUE, DISTRIBUTE_PER_USER, REFERRAL_CHAIN_AMOUNT_VALUE, DISTRIBUTED_AMOUNT_VALUE, SYSTEM_AMOUNT_VALUE, DESC_BOX } from '~/utils/constants'
 
 const approve = async (transaction) => {
   try {
@@ -20,6 +20,8 @@ const approve = async (transaction) => {
       ...user.inviterChain.slice(0, 8).map(address => address)
     ]
 
+    //check xem có đủ điều kiện nhận không
+    const validInviter = await userModel.filterValidReferalAddress( [user?.invitedBy], boxNumber)
     const validReferalChain = await userModel.filterValidReferalAddress(referalChain, boxNumber)
 
     const distributedAmount = validReferalChain.length * DISTRIBUTE_PER_USER
@@ -29,7 +31,7 @@ const approve = async (transaction) => {
 
     return {
       invitedBy: {
-        address: user.invitedBy ||process.env.SYSTEM_ADDRESS,
+        address: validInviter[0]?.address ||process.env.SYSTEM_ADDRESS,
         amount: DIRECTED_AMOUNT_VALUE
       },
       inviterChain: validReferalChain.map((user) => ({
@@ -37,7 +39,7 @@ const approve = async (transaction) => {
         amount: DISTRIBUTE_PER_USER
       })),
       distributedLevelUser: {
-        address: distributedUser.address,
+        address: distributedUser.address ||process.env.SYSTEM_ADDRESS,
         amount: DISTRIBUTED_AMOUNT_VALUE
       },
       system: {

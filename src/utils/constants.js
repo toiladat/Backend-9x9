@@ -116,3 +116,18 @@ export const BADGES = {
 
 export const ONE_YEAR = 365 * 24 * 60 * 60 * 1000
 export const ONE_DAY = 24 * 60 * 60 * 1000
+
+
+export const REWARD_DAYS = [
+  { day: 3, score: 99 },
+  { day: 21, score: 999 },
+  { day: 30, score: 999 }
+]
+export const REWARDS_MISSSIONS = {
+  shareLink: 99,
+  joinGroup: 99,
+  readTerms: 99
+}
+export const REWARDS_MINING = 99
+
+export const VALID_PLAY_TIMES = 9
