@@ -10,7 +10,7 @@ let signer = null
 let provider = null
 export const CONNECT_CONTRACT = async () => {
   try {
-    provider = new ethers.JsonRpcProvider('https://eth-mainnet.g.alchemy.com/v2/FJVO6TUmIb5ytV398zp5qww6BOJfB8mK')
+    provider = new ethers.JsonRpcProvider(process.env.RPC_ALCHEMY_URL)
 
     contractRead = new ethers.Contract(
       process.env.CONTRACT_ADDRESS,

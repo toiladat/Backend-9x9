@@ -15,7 +15,7 @@ const validTransactionApprove = async (req, res, next) => {
     const { provider } = await GET_CONTRACT()
     const receipt = await provider.getTransactionReceipt(txHash)
     if ( receipt?.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
-    const contractAddress = '0xdAC17F958D2ee523a2206206994597C13D831ec7'
+    const contractAddress = process.env.CONTRACT_MUSDT_ADDRESS
     const targetLog = receipt.logs.find(
       log => log.address.toLowerCase() === contractAddress.toLowerCase()
     )
