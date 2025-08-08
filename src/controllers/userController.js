@@ -92,7 +92,10 @@ const resendOtp = async (req, res, next) => {
 //[GET]/user/ranking
 const getUsers = async (req, res, next) => {
   try {
-    const filter = { _destroy: false }
+    const filter = {
+      _destroy: false,
+      score: { $gt: 0 }
+    }
     const options = { projection: { address:1, score:1 } }
     const result = await userService.getUsers(req.pagination, filter, options)
     return res.status(StatusCodes.OK).json(result)
