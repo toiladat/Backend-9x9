@@ -14,14 +14,16 @@ const validTransactionApprove = async (req, res, next) => {
 
     const { provider } = await GET_CONTRACT()
     const receipt = await provider.getTransactionReceipt(txHash)
+    console.log('🚀 ~ boxMiddewares.js:17 ~ validTransactionApprove ~ receipt:', receipt)
     if ( receipt?.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
     const contractAddress = process.env.CONTRACT_MUSDT_ADDRESS
+    console.log('🚀 ~ boxMiddewares.js:19 ~ validTransactionApprove ~ contractAddress:', contractAddress)
     const targetLog = receipt.logs.find(
       log => log.address.toLowerCase() === contractAddress.toLowerCase()
     )
     if (!targetLog) throw new ApiError(StatusCodes.BAD_REQUEST, 'Contract USDT không khớp')
     const addressParseLog = '0x'+ targetLog.topics[1].slice(26)
-    if ( addressParseLog !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
+    if ( addressParseLog.toLocaleLowerCase() !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
 
     const formatReceipt = {
       address,
