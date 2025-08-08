@@ -33,6 +33,7 @@ const approve = async (req, res, next) => {
 const openBox = async (req, res, next ) => {
   try {
     const transaction= req.transaction
+    console.log('🚀 ~ boxController.js:36 ~ openBox ~ transaction:', transaction)
     const result = await boxService.openBox( transaction)
     const boxNumber = result.openBoxHistories.filter(history => history.open).length
     res.status(StatusCodes.OK).json({ success: true, boxNumber })

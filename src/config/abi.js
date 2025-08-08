@@ -23,6 +23,18 @@ export const contractABI = [
         name: 'boxNumber',
         type: 'uint8',
       },
+      {
+        indexed: false,
+        internalType: 'address[]',
+        name: 'recipients',
+        type: 'address[]',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256[]',
+        name: 'amounts',
+        type: 'uint256[]',
+      },
     ],
     name: 'BoxOpened',
     type: 'event',

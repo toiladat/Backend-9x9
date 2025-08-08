@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { DIRECTED_AMOUNT_TYPE, DISTRIBUTED_AMOUNT_TYPE, REFERRAL_CHAIN_AMOUNT_TYPE, SYSTEM_AMOUNT_TYPE } from './constants'
 
 export const formatParsedLog = (parsedLog, decimals = 6) => {
+
   const addresses = parsedLog.args[2]
   const amounts = parsedLog.args[3]
 
