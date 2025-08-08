@@ -103,7 +103,7 @@ const getUsers = async (pagination, filter, options ) => {
     )
       .skip(skip)
       .limit(limit)
-      .sort({ score: -1 })
+      .sort({ score: -1, createdAt: 1 }) // sort để lấy rank đồng bộ với get me
       .toArray()
     const pageTotal = Math.ceil(totalItems / limit)
     return {
@@ -245,10 +245,16 @@ const updateBadge = async (address, badges) => {
   } catch (error) { throw error}
 }
 
-const getRank = async (score) => {
+const getRank = async (user) => {
   try {
     return await GET_DB().collection(USER_COLLECTION_NAME).countDocuments({
-      score: { $gt: score }
+      $or: [
+        { score: { $gt: user.score } },
+        {
+          score: user.score,
+          createdAt: { $lt: user.createdAt }
+        }
+      ]
     })
   } catch (error) { throw error}
 }

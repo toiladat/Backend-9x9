@@ -65,19 +65,19 @@ const getUsers = async (pagination, filter, options) => {
 
 const getMe = async (address) => {
   try {
-    const result = await userModel.findUserByAddress(address)
-    delete result.refreshToken
-    delete result.nonce
-    result.openBoxHistories = result.openBoxHistories.map((history, idx) => ({
+    const user = await userModel.findUserByAddress(address)
+    delete user.refreshToken
+    delete user.nonce
+    user.openBoxHistories = user.openBoxHistories.map((history, idx) => ({
       ...history,
       description: DESC_BOX[idx],
       title: `Hộp ${idx+1}`
     }))
-    result.currentBox = result.openBoxHistories.filter(history => history.open).length + 1
-    result.amount = result.directedAmount + result.referralChainAmount + result.distributedAmount
-    result.invitedCounts = await userModel.getInvitedUsers(address)
-    result.rank = await userModel.getRank(result?.score) + 1
-    return result
+    user.currentBox = user.openBoxHistories.filter(history => history.open).length + 1
+    user.amount = user.directedAmount + user.referralChainAmount + user.distributedAmount
+    user.invitedCounts = await userModel.getInvitedUsers(address)
+    user.rank = await userModel.getRank(user) + 1
+    return user
   } catch (error) { throw error}
 }
 
