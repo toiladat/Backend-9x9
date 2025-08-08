@@ -14,10 +14,8 @@ const validTransactionApprove = async (req, res, next) => {
 
     const { provider } = await GET_CONTRACT()
     const receipt = await provider.getTransactionReceipt(txHash)
-    console.log('🚀 ~ boxMiddewares.js:17 ~ validTransactionApprove ~ receipt:', receipt)
     if ( receipt?.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
-    const contractAddress = process.env.CONTRACT_MUSDT_ADDRESS
-    console.log('🚀 ~ boxMiddewares.js:19 ~ validTransactionApprove ~ contractAddress:', contractAddress)
+    const contractAddress = '0xdAC17F958D2ee523a2206206994597C13D831ec7'
     const targetLog = receipt.logs.find(
       log => log.address.toLowerCase() === contractAddress.toLowerCase()
     )
