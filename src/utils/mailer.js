@@ -5,7 +5,7 @@ const sendVerificationEmail = (to, subject, htmlContent) => {
 
   const adminEmail = process.env.SEND_MAI_EMAILL
   const adminPassword = process.env.SEND_MAIL_PASSWORD
-  const mailHost = 'smtp.zoho.com'
+  const mailHost = 'smtp.gmail.com'
   const mailPort = 465
 
   const transporter = nodeMailer.createTransport({

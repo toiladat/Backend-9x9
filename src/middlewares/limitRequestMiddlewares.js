@@ -1,6 +1,6 @@
 import rateLimit from 'express-rate-limit'
 
-export const playLimit = rateLimit({
+export const limitRequest = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
   statusCode:500,

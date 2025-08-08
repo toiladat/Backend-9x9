@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { userController } from '~/controllers/userController'
 import { authMiddlewares } from '~/middlewares/authMiddlewares'
+import { limitRequest } from '~/middlewares/limitRequestMiddlewares'
 import { pagination } from '~/utils/pagination'
 import { userValidation } from '~/validations/userValidation'
 
@@ -131,7 +132,7 @@ Route.route('/verify-kyc')
  *         description: Lỗi server
  */
 Route.route('/resend-otp')
-  .patch(userController.resendOtp)
+  .patch(limitRequest, userController.resendOtp)
 
 /**
  * @swagger
