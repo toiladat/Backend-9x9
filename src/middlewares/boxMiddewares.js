@@ -8,12 +8,13 @@ import { formatParsedLog } from '~/utils/formatters'
 
 const validTransactionApprove = async (req, res, next) => {
   try {
+
     const { address } = req.decoded
     const { txHash, boxNumber } = req.body
-    const { provider } = await GET_CONTRACT()
 
+    const { provider } = await GET_CONTRACT()
     const receipt = await provider.getTransactionReceipt(txHash)
-    if ( receipt.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
+    if ( receipt?.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
     const contractAddress = process.env.CONTRACT_MUSDT_ADDRESS
     const targetLog = receipt.logs.find(
       log => log.address.toLowerCase() === contractAddress.toLowerCase()
