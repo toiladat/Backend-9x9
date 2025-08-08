@@ -110,7 +110,19 @@ const validMissionCompleted = async ( req, res, next) => {
       joinGroup: Joi.boolean().strict(),
       readTerms: Joi.boolean().strict()
     })
-    await correctCodition.validateAsync(req.body?.missionCompleted, { abortEarly: false })
+    const { shareLink, joinGroup, readTerms } = req.query
+
+    const toBool = (v) => {
+      if (v === undefined) throw new ApiError(StatusCodes.BAD_REQUEST, 'Vui Lòng nhập đúng nhiệm vụ')
+      return v === 'true' || v === true
+    }
+
+    req.missionCompleted = {
+      shareLink: toBool(shareLink),
+      joinGroup: toBool(joinGroup),
+      readTerms: toBool(readTerms)
+    }
+    await correctCodition.validateAsync(req.missionCompleted, { abortEarly: false })
     next()
   } catch (error) { next( new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, error.message))}
 }

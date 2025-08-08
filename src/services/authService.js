@@ -75,7 +75,7 @@ const login = async (reqBody) => {
 
 
     // cập nhật ngày đăng nhập liên tiếp
-    await updateContinuousLoginDay(user.address)
+    // await updateContinuousLoginDay(user.address)
 
     const tokenPayload = {
       address: user.address,

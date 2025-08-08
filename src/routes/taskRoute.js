@@ -60,30 +60,29 @@ Route.route('/')
 /**
  * @swagger
  * /task/update:
- *   patch:
+ *   get:
  *     summary: Cập nhật trạng thái nhiệm vụ
  *     tags:
  *       - TASK
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               missionCompleted:
- *                 type: object
- *                 description: Trạng thái các nhiệm vụ người dùng đã hoàn thành
- *                 properties:
- *                   shareLink:
- *                     type: boolean
- *                     example: true
- *                   joinGroup:
- *                     type: boolean
- *                     example: true
- *                   readTerms:
- *                     type: boolean
- *                     example: false
+ *     parameters:
+ *       - in: query
+ *         name: shareLink
+ *         schema:
+ *           type: boolean
+ *         description: Hoàn thành nhiệm vụ chia sẻ liên kết
+ *         example: true
+ *       - in: query
+ *         name: joinGroup
+ *         schema:
+ *           type: boolean
+ *         description: Hoàn thành nhiệm vụ tham gia nhóm
+ *         example: false
+ *       - in: query
+ *         name: readTerms
+ *         schema:
+ *           type: boolean
+ *         description: Hoàn thành nhiệm vụ đọc điều khoản
+ *         example: true
  *     responses:
  *       200:
  *         description: Trạng thái nhiệm vụ sau khi cập nhật
@@ -136,6 +135,6 @@ Route.route('/')
  *         description: Lỗi server nội bộ
  */
 Route.route('/update')
-  .patch(userValidation.validMissionCompleted, taskController.updateTask)
+  .get(userValidation.validMissionCompleted, taskController.updateTask)
 
 export const taskRoute = Route

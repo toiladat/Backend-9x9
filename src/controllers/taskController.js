@@ -12,23 +12,22 @@ const getTask = async (req, res, next) => {
   } catch (error) { next( error )}
 }
 
-//[PATCH] /task/update
+//[GET] /task/update
 const updateTask = async (req, res, next) => {
   try {
     const address = req.decoded.address
-    const missions = req.body.missionCompleted
+    const missions = req.missionCompleted
     const taskOfUser =await taskService.getTask(address)
     let totalReward = 0
 
-    for (const misssion of Object.keys(missions)) {
-      const newValue = missions[misssion]
-      const oldValue = taskOfUser[misssion]
+    for (const mission of Object.keys(missions)) {
+      const newValue = missions[mission]
+      const oldValue = taskOfUser[mission]
       if (!oldValue && newValue) {
-        totalReward += REWARDS_MISSSIONS[misssion]
+        totalReward += REWARDS_MISSSIONS[mission]
       }
     }
 
-    // Cộng tiền nếu có
     if (totalReward > 0) {
       await userModel.grantReward({ address, score: totalReward })
     }
