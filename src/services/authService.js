@@ -37,7 +37,8 @@ const login = async (reqBody) => {
     let user = await userModel.findUserByAddress(address)
 
     if (!user) {
-      const isSystemAddress = address.toLowerCase() === process.env.SYSTEM_ADDRESS
+      const systemAddress = process.env.SYSTEM_ADDRESS
+      const isSystemAddress = address.toLowerCase() === systemAddress.toLocaleLowerCase()
       // Nếu là ví hệ thống → tạo user đặc biệt
       if (isSystemAddress) {
         const createdUser = await userModel.createUser({
