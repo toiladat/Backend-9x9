@@ -179,6 +179,12 @@ Route.route('/tree')
  *             schema:
  *               type: object
  *               properties:
+ *                 title:
+ *                   type: string
+ *                   example: "Sao rộng mở"
+ *                 content:
+ *                   type: string
+ *                   example: "Lan tỏa mạnh mẽ – hỗ trợ người khác cùng thức tỉnh."
  *                 invitedCount:
  *                   type: number
  *                   example: 5

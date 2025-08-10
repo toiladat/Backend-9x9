@@ -78,15 +78,42 @@ export const EMAIL_HTML = (otpKyc) => `
 </html>
 `
 export const DESC_BOX = [
-  'Sao thức tỉnh',
-  'Sao gieo hạt',
-  'Sao mở lòng',
-  'Sao kết nối',
-  'Sao phản chiếu',
-  'Sao dẫn lối',
-  'Sao khai sáng',
-  'Sao rộng mở',
-  'Sao kiến tạo'
+  {
+    title: 'Sao thức tỉnh',
+    content: 'Trải nghiệm đầu tiên, gắp sao nhận thông điệp thức tỉnh.'
+  },
+  {
+    title: 'Sao gieo hạt',
+    content: 'Giới thiệu StarBox cho người thân – tạo điểm chạm đầu tiên.'
+  },
+  {
+    title: 'Sao mở lòng',
+    content: 'Nhận tín hiệu từ bên trong, bước vào hành trình khai sáng.'
+  },
+  {
+    title: 'Sao kết nối',
+    content: 'Kết nối những người đồng hành, cùng học hỏi – chữa lành.'
+  },
+  {
+    title: 'Sao phản chiếu',
+    content: 'Đối diện thử thách – nhìn sâu vào bóng tối bên trong.'
+  },
+  {
+    title: 'Sao dẫn lối',
+    content: 'Trở thành người chia sẻ, truyền cảm hứng cho nhóm nhỏ.'
+  },
+  {
+    title: 'Sao khai sáng',
+    content: 'Hiểu rõ sứ mệnh, bắt đầu xây hệ thống cộng hưởng.'
+  },
+  {
+    title: 'Sao rộng mở',
+    content: 'Lan tỏa mạnh mẽ – hỗ trợ người khác cùng thức tỉnh.'
+  },
+  {
+    title: 'Sao kiến tạo',
+    content: 'Trở thành Nhà kiến tạo – đồng hành cùng 9x9 phát triển dài lâu.'
+  }
 ]
 
 

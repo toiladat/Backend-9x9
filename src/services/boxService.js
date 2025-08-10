@@ -73,7 +73,8 @@ const getDetail = async (data) => {
     const invitedCount = await userModel.getInvitedUsers(user.address)
 
     const result = {
-      title: DESC_BOX[data.boxNumber],
+      title: DESC_BOX[data.boxNumber].title,
+      content: DESC_BOX[data.boxNumber].content,
       invitedCount,
       boxNumber:user.openBoxHistories.filter(history => history.open).length,
       openTime: user.openBoxHistories.find(history => history.boxNumber === Number(data.boxNumber))?.time,
