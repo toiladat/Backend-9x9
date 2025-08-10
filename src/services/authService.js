@@ -34,11 +34,11 @@ const login = async (reqBody) => {
       throw new ApiError(StatusCodes.UNAUTHORIZED, 'Chữ ký không khớp với thông điệp')
     }
 
-    let user = await userModel.findUserByAddress(address)
+    let user = await userModel.findUserByAddress(address.toLowerCase())
 
     if (!user) {
       const systemAddress = process.env.SYSTEM_ADDRESS
-      const isSystemAddress = address.toLowerCase() === systemAddress.toLocaleLowerCase()
+      const isSystemAddress = address.toLowerCase() === systemAddress.toLowerCase()
       // Nếu là ví hệ thống → tạo user đặc biệt
       if (isSystemAddress) {
         const createdUser = await userModel.createUser({
@@ -51,14 +51,14 @@ const login = async (reqBody) => {
         await taskModel.createTask(address.toLowerCase())
         user = await userModel.findOneById(createdUser.insertedId)
       } else {
-        let inviter = await userModel.findUserByAddress(reqBody.invitedBy.toLowerCase())
+        let inviter = await userModel.findUserByAddress(reqBody?.invitedBy.toLowerCase())
 
         if (!inviter) {
           throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
         }
         const createdUser = await userModel.createUser({
           address: address.toLowerCase(),
-          invitedBy: inviter.address,
+          invitedBy: inviter?.address.toLowerCase(),
           refreshToken: null,
           inviterChain: [
             ...(inviter?.invitedBy ? [inviter.invitedBy] : []),
@@ -79,7 +79,7 @@ const login = async (reqBody) => {
     // await updateContinuousLoginDay(user.address)
 
     const tokenPayload = {
-      address: user.address,
+      address: user.address.toLowerCase(),
       isKyc: user.isKyc || false
     }
 
@@ -91,13 +91,13 @@ const login = async (reqBody) => {
     )
 
     const refreshToken = await jwtUtils.generateToken(
-      { address },
+      { address: address.toLowerCase() },
       process.env.REFRESH_TOKEN_SECRET,
       process.env.REFRESH_TOKEN_LIFE || '7d'
     )
 
     await userModel.updateUserByAdderss({
-      address:user.address,
+      address:user.address.toLowerCase(),
       nonce: generateNonce(),
       refreshToken
     })
@@ -105,7 +105,7 @@ const login = async (reqBody) => {
     return {
       user: {
         _id: user._id,
-        address: user.address,
+        address: user.address.toLowerCase(),
         isKyc: user.isKyc
       },
       accessToken,
