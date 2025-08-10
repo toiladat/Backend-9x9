@@ -7,7 +7,7 @@ import { miningHistoriesModel } from '~/models/miningHistoriesModel'
 
 const updateUserByAddress = async (data) => {
   try {
-    return await userModel.updateUserByAdderss(data)
+    return await userModel.updateUserByAddress(data)
   } catch (error) { throw error }
 }
 
@@ -48,7 +48,7 @@ const verifyKyc = async (data) => {
       process.env.ACCESS_TOKEN_LIFE || '15m'
     )
 
-    const user = await userModel.updateUserByAdderss({
+    const user = await userModel.updateUserByAddress({
       address: data.address,
       email:data.email,
       isKyc:true

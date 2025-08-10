@@ -28,7 +28,7 @@ const create = async( { address, score }) => {
     }
 
     //Update users collection
-    await userModel.updateUserByAdderss({
+    await userModel.updateUserByAddress({
       address,
       score: score + user.score,
       restTimes: user.restTimes -1,
@@ -48,7 +48,7 @@ const getRestTimes = async (address) => {
       recovered.restTimes !== user.restTimes ||
       new Date(recovered.lastPlayedTime).getTime() !== new Date(user.lastPlayedTime).getTime()
     ) {
-      await userModel.updateUserByAdderss({
+      await userModel.updateUserByAddress({
         address,
         restTimes: recovered.restTimes,
         lastPlayedTime: recovered.lastPlayedTime

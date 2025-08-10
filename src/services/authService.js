@@ -96,7 +96,7 @@ const login = async (reqBody) => {
       process.env.REFRESH_TOKEN_LIFE || '7d'
     )
 
-    await userModel.updateUserByAdderss({
+    await userModel.updateUserByAddress({
       address:user.address.toLowerCase(),
       nonce: generateNonce(),
       refreshToken
@@ -162,7 +162,7 @@ const refreshAccessToken = async (refreshToken) => {
 const updateRefreshToken = async (data) => {
   try {
     const { address, refreshToken } = data
-    return await userModel.updateUserByAdderss({ address, refreshToken })
+    return await userModel.updateUserByAddress({ address, refreshToken })
   } catch (error) { throw error}
 }
 

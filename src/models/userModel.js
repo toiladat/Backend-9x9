@@ -118,7 +118,7 @@ const getUsers = async (pagination, filter, options ) => {
   } catch (error) { throw new Error(error)}
 }
 
-const updateUserByAdderss = async(data, options = { updateTimestamp: false }) => {
+const updateUserByAddress = async(data, options = { updateTimestamp: false }) => {
   try {
     const updatedData = { ...data }
     if (options.updateTimestamp)
@@ -276,7 +276,7 @@ export const userModel = {
   findUserByAddress,
   findUserByEmail,
   getUsers,
-  updateUserByAdderss,
+  updateUserByAddress,
   openBox,
   distributeAmounts,
   findDistributedUser,
