@@ -7,6 +7,7 @@ import crypto from 'crypto'
 import { taskModel } from '~/models/taskModel'
 import { getDayDiff } from '~/utils/getDayDiff'
 import { taskService } from './taskService'
+import { REWARDS_FOR_INVITE } from '~/utils/constants'
 
 const generateNonce = () => {
   return crypto.randomBytes(16).toString('hex')
@@ -47,33 +48,40 @@ const login = async (reqBody) => {
           inviterChain: [],
           refreshToken: null
         })
-
         await taskModel.createTask(address.toLowerCase())
         user = await userModel.findOneById(createdUser.insertedId)
       } else {
-        let inviter = await userModel.findUserByAddress(reqBody?.invitedBy.toLowerCase())
-
+        const inviter = await userModel.findUserByAddress(reqBody?.invitedBy.toLowerCase())
         if (!inviter) {
           throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
         }
+
+        // Tạo user mới
         const createdUser = await userModel.createUser({
           address: address.toLowerCase(),
-          invitedBy: inviter?.address.toLowerCase(),
+          invitedBy: inviter.address.toLowerCase(),
           refreshToken: null,
           inviterChain: [
-            ...(inviter?.invitedBy ? [inviter.invitedBy] : []),
-            ...((inviter?.inviterChain || []).slice(0, 8))
+            ...(inviter.invitedBy ? [inviter.invitedBy] : []),
+            ...((inviter.inviterChain || []).slice(0, 8))
           ]
         })
 
-        await taskModel.createTask(address.toLowerCase())
+        await Promise.all([
+          // thêm điểm thịnh vượng cho người mời
+          userModel.updateUserByAddress(
+            { address: inviter?.address.toLowerCase(), score: inviter?.score + REWARDS_FOR_INVITE }),
+          // tạo task
+          taskModel.createTask(address.toLowerCase())
+        ])
+
+        // Lấy lại thông tin user mới
         user = await userModel.findOneById(createdUser.insertedId)
       }
     }
     else if (user?.nonce !== message) {
       throw new ApiError(StatusCodes.UNAUTHORIZED, 'Vui lòng ký trên thông điệp mới nhất')
     }
-
 
     // cập nhật ngày đăng nhập liên tiếp
     // await updateContinuousLoginDay(user.address)

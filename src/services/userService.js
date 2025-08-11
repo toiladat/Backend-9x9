@@ -67,23 +67,37 @@ const getUsers = async (pagination, filter, options) => {
 const getMe = async (address) => {
   try {
     const user = await userModel.findUserByAddress(address)
-    delete user.refreshToken
-    delete user.nonce
-    user.openBoxHistories = user.openBoxHistories.map((history, idx) => ({
+    const { refreshToken, nonce, ...safeUser } = user
+
+    const openBoxHistories = safeUser.openBoxHistories.map((history, idx) => ({
       ...history,
       description: DESC_BOX[idx],
-      title: `Hộp ${idx+1}`
+      title: `Hộp ${idx + 1}`
     }))
-    user.currentBox = user.openBoxHistories.filter(history => history.open).length + 1
-    user.amount = user.directedAmount + user.referralChainAmount + user.distributedAmount
-    user.invitedCounts = await userModel.getInvitedUsers(address)
-    user.rank = await userModel.getRank(user) + 1
-    user.journey = getDayDiff(
-      new Date(user.createdAt),
-      new Date()
-    )
-    return user
-  } catch (error) { throw error}
+
+    const [
+      invitedCounts,
+      rank,
+      comunity
+    ] = await Promise.all([
+      userModel.getInvitedUsers(address),
+      userModel.getRank(safeUser),
+      userModel.getCommunity(safeUser.address)
+    ])
+
+    return {
+      ...safeUser,
+      openBoxHistories,
+      currentBox: openBoxHistories.filter(h => h.open).length + 1,
+      amount: safeUser.directedAmount + safeUser.referralChainAmount + safeUser.distributedAmount,
+      invitedCounts,
+      rank: rank + 1,
+      journey: getDayDiff(new Date(safeUser.createdAt), new Date()),
+      comunity
+    }
+  } catch (error) {
+    throw error
+  }
 }
 
 const findAndUpdateBadge = async (address) => {

@@ -44,6 +44,7 @@ const getDetail = async(req, res, next) => {
   try {
     const address = req.decoded.address
     const boxNumber = req.params.boxNumber
+    if (boxNumber < 1 || boxNumber > 9 ) throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box không hợp lệ')
     const result = await boxService.getDetail({ address, boxNumber })
     res.status(StatusCodes.OK).json(result)
   } catch (error) { next(error)}

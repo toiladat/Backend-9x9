@@ -158,3 +158,5 @@ export const REWARDS_MISSSIONS = {
 export const REWARDS_MINING = 99
 
 export const VALID_PLAY_TIMES = 9
+
+export const REWARDS_FOR_INVITE = 999

@@ -268,6 +268,43 @@ const grantReward = async ({ address, score }) => {
   } catch (error) { throw new Error(error) }
 }
 
+export const getCommunity = async (address) => {
+  try {
+    const result = await GET_DB()
+      .collection(USER_COLLECTION_NAME)
+      .aggregate([
+        {
+          $match: { address } // bắt đầu từ user gốc
+        },
+        {
+          $graphLookup: {
+            from: USER_COLLECTION_NAME, // collection đích
+            startWith: '$address', // giá trị ban đầu
+            connectFromField: 'address', // field để nối từ
+            connectToField: 'invitedBy', // field để nối tới
+            as: 'invitedUsers' // output array
+          }
+        },
+        {
+          $project: {
+            total: { $size: '$invitedUsers' } // đếm số lượng user mời trực tiếp + gián tiếp
+          }
+        }
+      ])
+      .toArray()
+
+    return result[0]?.total || 0
+  } catch (error) {
+    throw new Error(error)
+  }
+}
+
+const getTotalUser = async() => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).countDocuments()
+  } catch (error) { new Error(error)}
+}
+
 export const userModel = {
   USER_COLLECTION_NAME,
   USER_COLLECTION_SCHEMA,
@@ -285,5 +322,7 @@ export const userModel = {
   getTopUsersByScore,
   updateBadge,
   getRank,
-  grantReward
+  grantReward,
+  getCommunity,
+  getTotalUser
 }

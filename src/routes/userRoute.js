@@ -281,6 +281,10 @@ Route.route('/ranking')
  *                   type: number
  *                   description: xếp hạng thịnh vượng
  *                   example: 2
+ *                 comunity:
+ *                   type: number
+ *                   description: số người nằm trong cây ref
+ *                   example: 2
  *       500:
  *         description: Lỗi server
  */

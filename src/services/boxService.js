@@ -70,23 +70,31 @@ const openBox = async ( transaction) => {
 const getDetail = async (data) => {
   try {
     const user = await userModel.findUserByAddress(data.address)
-    const invitedCount = await userModel.getInvitedUsers(user.address)
+    const [invitedCount, totalUserCount] = await Promise.all([
+      userModel.getInvitedUsers(user.address),
+      userModel.getTotalUser()
+    ])
+    const { title, content } = DESC_BOX[data.boxNumber - 1]
+    const { openBoxHistories, invitedBy, directedAmount, distributedAmount, referralChainAmount } = user
 
-    const result = {
-      title: DESC_BOX[data.boxNumber -1 ].title,
-      content: DESC_BOX[data.boxNumber - 1].content,
+    return {
+      title,
+      content,
       invitedCount,
-      boxNumber:user.openBoxHistories.filter(history => history.open).length,
-      openTime: user.openBoxHistories.find(history => history.boxNumber === Number(data.boxNumber))?.time,
-      invitedBy: user.invitedBy,
-      directedAmount: user.directedAmount,
-      distributedAmount: user.distributedAmount,
-      referralChainAmount:user.referralChainAmount,
-      receivedTotal : user.directedAmount + user.distributedAmount + user.referralChainAmount
+      boxNumber: openBoxHistories.filter(h => h.open).length,
+      openTime: openBoxHistories.find(h => h.boxNumber === Number(data.boxNumber))?.time,
+      invitedBy,
+      directedAmount,
+      distributedAmount,
+      referralChainAmount,
+      receivedTotal: directedAmount + distributedAmount + referralChainAmount,
+      totalUserCount
     }
-    return result
-  } catch (error) { throw error}
+  } catch (error) {
+    throw error
+  }
 }
+
 
 export const boxService = {
   openBox,
