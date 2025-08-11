@@ -4,10 +4,11 @@ import { BADGES, DESC_BOX, EMAIL_HTML, EMAIL_SUBJECT, ONE_YEAR } from '~/utils/c
 import sendVerificationEmail from '~/utils/mailer'
 import { jwtUtils } from '~/utils/jwt'
 import { miningHistoriesModel } from '~/models/miningHistoriesModel'
+import { getDayDiff } from '~/utils/getDayDiff'
 
-const updateUserByAddress = async (data) => {
+const updateUserByAddress = async (data, option ) => {
   try {
-    return await userModel.updateUserByAddress(data)
+    return await userModel.updateUserByAddress(data, option)
   } catch (error) { throw error }
 }
 
@@ -77,6 +78,10 @@ const getMe = async (address) => {
     user.amount = user.directedAmount + user.referralChainAmount + user.distributedAmount
     user.invitedCounts = await userModel.getInvitedUsers(address)
     user.rank = await userModel.getRank(user) + 1
+    user.journey = getDayDiff(
+      new Date(user.createdAt),
+      new Date()
+    )
     return user
   } catch (error) { throw error}
 }

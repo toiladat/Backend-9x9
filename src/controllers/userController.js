@@ -117,10 +117,21 @@ const getMe = async(req, res, next) => {
   } catch (error) { next(error)}
 }
 
+//[PATCH]/user/update
+const updateUser = async (req, res, next) => {
+  try {
+    const updatedUser = await userService.updateUserByAddress({
+      address: req.decoded.address,
+      ...req.body
+    }, { updateTimestamp: true })
+    res.status(StatusCodes.OK).json(updatedUser)
+  } catch (error) { next(error)}
+}
 export const userController = {
   requestKyc,
   verifyKyc,
   resendOtp,
   getUsers,
-  getMe
+  getMe,
+  updateUser
 }

@@ -128,7 +128,7 @@ const updateUserByAddress = async(data, options = { updateTimestamp: false }) =>
       { $set: updatedData },
       {
         returnDocument: 'after',
-        projection: { address: 1, email: 1, score: 1, history: 1, isKyc: 1 }
+        projection: { address: 1, email: 1, score: 1, isKyc: 1, name:1 }
       }
     )
     return result

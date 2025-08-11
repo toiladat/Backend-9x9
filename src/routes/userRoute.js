@@ -287,4 +287,53 @@ Route.route('/ranking')
 Route.route('/get-me')
   .get(authMiddlewares.isKyc, userController.getMe)
 
+/**
+ * @swagger
+ * /user/update:
+ *   patch:
+ *     summary: Cập nhật thông tin người dùng
+ *     tags:
+ *       - USER
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "Nguyen Van A"
+ *     responses:
+ *       200:
+ *         description: Cập nhật thông tin người dùng thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 address:
+ *                   type: string
+ *                   example: "Nguyen Van A"
+ *                 email:
+ *                   type: string
+ *                   example: "nguyenvana@example.com"
+ *                 score:
+ *                   type: integer
+ *                   example: 85
+ *                 isKyc:
+ *                   type: boolean
+ *                   example: true
+ *                 name:
+ *                   type: string
+ *                   example: "Nguyen Van A"
+ *       500:
+ *         description: Lỗi server
+ */
+Route.route('/update')
+  .patch(authMiddlewares.isKyc, userValidation.updateUser, userController.updateUser
+  )
+
 export const userRoute = Route

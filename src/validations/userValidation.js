@@ -23,6 +23,26 @@ const createUser =async (req, res, next ) => {
   }
 }
 
+const updateUser =async (req, res, next ) => {
+
+  const correctCodition = Joi.object({
+    name: Joi.string().required().trim().strict().messages({
+      'any.required': 'Tên không được để trống'
+    })
+  }).strict()
+
+  try {
+    // abortEarly chỉ định nếu có lỗi thì trả về tất cả
+    await correctCodition.validateAsync(req.body, { abortEarly:false })
+    next()
+
+  } catch (error) {
+    const errorMessage= new Error(error).message
+    const customError = new ApiError(StatusCodes.UNPROCESSABLE_ENTITY, errorMessage)
+    next(customError)
+  }
+}
+
 const login = async (req, res, next) => {
   const correctCodition = Joi.object({
     address: Joi.string().required().trim().strict().messages({
@@ -128,6 +148,7 @@ const validMissionCompleted = async ( req, res, next) => {
 }
 export const userValidation = {
   createUser,
+  updateUser,
   login,
   requestkyc,
   verifyKyc,
