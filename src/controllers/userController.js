@@ -98,6 +98,13 @@ const getUsers = async (req, res, next) => {
     }
     const options = { projection: { address:1, score:1 } }
     const result = await userService.getUsers(req.pagination, filter, options)
+    const user = await userService.getMe(req.decoded.address)
+    result.user = {
+      me : user.address,
+      score: user.score,
+      rank: user.rank
+    }
+
     return res.status(StatusCodes.OK).json(result)
   } catch (error) { next(error) }
 }

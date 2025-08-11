@@ -1,13 +1,13 @@
 import { userService } from '~/services/userService'
 import { StatusCodes } from 'http-status-codes'
 import { numerologymodel } from '~/models/numerologyModel'
-import { calculateLifePathNumber } from '~/utils/caculateDob'
+import { calculateNumerology } from '~/utils/caculateDob'
 
 //[GET]/numerology/numerology
 const numerology = async (req, res, next) => {
   try {
     const { birth, name } = req.query
-    const number = calculateLifePathNumber(birth)
+    const number = calculateNumerology(birth, name)
     await userService.updateUserByAddress({
       address: req.decoded.address,
       name,
