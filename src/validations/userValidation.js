@@ -136,7 +136,7 @@ const validMissionCompleted = async ( req, res, next) => {
       if (v === undefined) throw new ApiError(StatusCodes.BAD_REQUEST, 'Vui Lòng nhập đúng nhiệm vụ')
       return v === 'true' || v === true
     }
-
+    // phải truyền cả 3 nếu k sẽ falsy
     req.missionCompleted = {
       shareLink: toBool(shareLink),
       joinGroup: toBool(joinGroup),

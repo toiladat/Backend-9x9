@@ -268,7 +268,7 @@ const grantReward = async ({ address, score }) => {
   } catch (error) { throw new Error(error) }
 }
 
-export const getCommunity = async (address) => {
+const getCommunity = async (address) => {
   try {
     const result = await GET_DB()
       .collection(USER_COLLECTION_NAME)
@@ -299,9 +299,21 @@ export const getCommunity = async (address) => {
   }
 }
 
-const getTotalUser = async() => {
+const getLevelUsers = async() => {
   try {
-    return await GET_DB().collection(USER_COLLECTION_NAME).countDocuments()
+    return await GET_DB().collection(USER_COLLECTION_NAME)
+      .aggregate([
+        { $unwind: '$openBoxHistories' }, // tách từng box ra
+        { $match: { 'openBoxHistories.open': true } }, // chỉ lấy box đã mở
+        {
+          $group: {
+            _id: '$openBoxHistories.boxNumber',
+            userCount: { $sum: 1 }
+          }
+        },
+        { $sort: { _id: 1 } } // sắp xếp theo boxNumber
+      ])
+      .toArray()
   } catch (error) { new Error(error)}
 }
 
@@ -324,5 +336,5 @@ export const userModel = {
   getRank,
   grantReward,
   getCommunity,
-  getTotalUser
+  getLevelUsers
 }

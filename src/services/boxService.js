@@ -70,9 +70,9 @@ const openBox = async ( transaction) => {
 const getDetail = async (data) => {
   try {
     const user = await userModel.findUserByAddress(data.address)
-    const [invitedCount, totalUserCount] = await Promise.all([
+    const [invitedCount, levelUsers] = await Promise.all([
       userModel.getInvitedUsers(user.address),
-      userModel.getTotalUser()
+      userModel.getLevelUsers()
     ])
     const { title, content } = DESC_BOX[data.boxNumber - 1]
     const { openBoxHistories, invitedBy, directedAmount, distributedAmount, referralChainAmount } = user
@@ -88,7 +88,7 @@ const getDetail = async (data) => {
       distributedAmount,
       referralChainAmount,
       receivedTotal: directedAmount + distributedAmount + referralChainAmount,
-      totalUserCount
+      levelUsers
     }
   } catch (error) {
     throw error

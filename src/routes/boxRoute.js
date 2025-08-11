@@ -209,7 +209,23 @@ Route.route('/tree')
  *                 openTime:
  *                   type: string
  *                   format: date-time
- *                   example:  "2025-08-05T14:00:00Z"
+ *                   example: "2025-08-05T14:00:00Z"
+ *                 levelUsers:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: number
+ *                         example: 5
+ *                       userCount:
+ *                         type: number
+ *                         example: 13
+ *                   example:
+ *                     - _id: 5
+ *                       userCount: 13
+ *                     - _id: 6
+ *                       userCount: 8
  *       400:
  *         description: Số box không hợp lệ
  *         content:
