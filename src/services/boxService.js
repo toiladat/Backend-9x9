@@ -95,7 +95,6 @@ const getDetail = async (data) => {
   }
 }
 
-
 export const boxService = {
   openBox,
   approve,

@@ -8,6 +8,7 @@ import { taskModel } from '~/models/taskModel'
 import { getDayDiff } from '~/utils/getDayDiff'
 import { taskService } from './taskService'
 import { REWARDS_FOR_INVITE } from '~/utils/constants'
+import { formatAddress } from '~/utils/formatters'
 
 const generateNonce = () => {
   return crypto.randomBytes(16).toString('hex')
@@ -107,6 +108,7 @@ const login = async (reqBody) => {
     await userModel.updateUserByAddress({
       address:user.address.toLowerCase(),
       nonce: generateNonce(),
+      name: formatAddress(user.address.toLowerCase(), 5 ),
       refreshToken
     })
 

@@ -26,7 +26,6 @@ export const formatParsedLog = (parsedLog, decimals = 6) => {
   }
 }
 
-
 export const extractAddressesAndAmounts= (obj) => {
   const addresses = []
   const amounts = []
@@ -48,3 +47,5 @@ export const extractAddressesAndAmounts= (obj) => {
 
   return { addresses, amounts }
 }
+
+export const formatAddress = (address, end) => `${address?.slice(0, end)}...${address?.slice(-3)}`
