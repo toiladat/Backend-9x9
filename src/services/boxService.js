@@ -69,12 +69,14 @@ const openBox = async ( transaction) => {
 
 const getDetail = async (data) => {
   try {
-    const user = await userModel.findUserByAddress(data.address)
-    const [invitedCount, levelUsers] = await Promise.all([
-      userModel.getInvitedUsers(user.address),
-      userModel.getLevelUsers()
+    const { address, boxNumber } = data
+    const user = await userModel.findUserByAddress(address)
+    const [invitedCount, levelUsers, totalUserSystem] = await Promise.all([
+      userModel.getInvitedUsers(address),
+      userModel.getLevelUsers(address),
+      userModel.getCommunity(address)
     ])
-    const { title, content } = DESC_BOX[data.boxNumber - 1]
+    const { title, content } = DESC_BOX[boxNumber - 1]
     const { openBoxHistories, invitedBy, directedAmount, distributedAmount, referralChainAmount } = user
 
     return {
@@ -82,13 +84,14 @@ const getDetail = async (data) => {
       content,
       invitedCount,
       boxNumber: openBoxHistories.filter(h => h.open).length,
-      openTime: openBoxHistories.find(h => h.boxNumber === Number(data.boxNumber))?.time,
+      openTime: openBoxHistories.find(h => h.boxNumber === Number(boxNumber))?.time,
       invitedBy,
       directedAmount,
       distributedAmount,
       referralChainAmount,
       receivedTotal: directedAmount + distributedAmount + referralChainAmount,
-      levelUsers
+      levelUsers,
+      totalUserSystem
     }
   } catch (error) {
     throw error

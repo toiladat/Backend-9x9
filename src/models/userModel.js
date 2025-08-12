@@ -265,7 +265,7 @@ const grantReward = async ({ address, score }) => {
       { address },
       { $inc: { score } }
     )
-  } catch (error) { throw new Error(error) }
+  } catch (error) { throw error}
 }
 
 const getCommunity = async (address) => {
@@ -282,7 +282,8 @@ const getCommunity = async (address) => {
             startWith: '$address', // giá trị ban đầu
             connectFromField: 'address', // field để nối từ
             connectToField: 'invitedBy', // field để nối tới
-            as: 'invitedUsers' // output array
+            as: 'invitedUsers', // output array
+            maxDepth: 9 // nếu muốn giới hạn 9 tầng
           }
         },
         {
@@ -294,27 +295,57 @@ const getCommunity = async (address) => {
       .toArray()
 
     return result[0]?.total || 0
-  } catch (error) {
-    throw new Error(error)
-  }
+  } catch (error) {throw new Error(error)}
+
 }
 
-const getLevelUsers = async() => {
+const getLevelUsers = async (address) => {
   try {
     return await GET_DB().collection(USER_COLLECTION_NAME)
       .aggregate([
-        { $unwind: '$openBoxHistories' }, // tách từng box ra
-        { $match: { 'openBoxHistories.open': true } }, // chỉ lấy box đã mở
+        // 1️⃣ Tìm user gốc theo address
+        { $match: { address } },
+
+        // 2️⃣ Dùng graphLookup để lấy toàn bộ con cháu trong cây ref
+        {
+          $graphLookup: {
+            from: USER_COLLECTION_NAME, // collection
+            startWith: '$address', // bắt đầu từ address của user gốc
+            connectFromField: 'address', // so sánh với invitedBy của người khác
+            connectToField: 'invitedBy',
+            as: 'refTree', // kết quả lưu vào mảng refTree
+            maxDepth: 9 // nếu muốn giới hạn 9 tầng
+          }
+        },
+
+        // 3️⃣ Chuyển refTree thành nhiều document riêng
+        { $unwind: '$refTree' },
+
+        // 4️⃣ Tách từng box ra
+        { $unwind: '$refTree.openBoxHistories' },
+
+        // 5️⃣ Chỉ lấy box đã mở
+        { $match: { 'refTree.openBoxHistories.open': true } },
+
+        // 6️⃣ Gom nhóm theo boxNumber
         {
           $group: {
-            _id: '$openBoxHistories.boxNumber',
+            _id: '$refTree.openBoxHistories.boxNumber',
             userCount: { $sum: 1 }
           }
         },
-        { $sort: { _id: 1 } } // sắp xếp theo boxNumber
+
+        // 7️⃣ Sắp xếp theo boxNumber
+        { $sort: { _id: 1 } }
       ])
       .toArray()
-  } catch (error) { new Error(error)}
+  } catch (error) {throw error }
+}
+
+const getTotalUserSystem = async() => {
+  try {
+    return await GET_DB().collection(USER_COLLECTION_NAME).countDocuments()
+  } catch (error) { throw error}
 }
 
 export const userModel = {
@@ -336,5 +367,6 @@ export const userModel = {
   getRank,
   grantReward,
   getCommunity,
-  getLevelUsers
+  getLevelUsers,
+  getTotalUserSystem
 }
