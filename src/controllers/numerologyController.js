@@ -10,7 +10,6 @@ const numerology = async (req, res, next) => {
     const number = calculateNumerology(birth, name)
     await userService.updateUserByAddress({
       address: req.decoded.address,
-      name,
       mainNumber: number.mainNumber
     })
     const meaning = await numerologymodel.getMeanings(number.mainNumber)
