@@ -46,26 +46,36 @@ const login = async (reqBody) => {
         const createdUser = await userModel.createUser({
           address: address.toLowerCase(),
           invitedBy: null,
+          spillover: null,
           inviterChain: [],
           refreshToken: null
         })
         await taskModel.createTask(address.toLowerCase())
         user = await userModel.findOneById(createdUser.insertedId)
       } else {
-        const inviter = await userModel.findUserByAddress(reqBody?.invitedBy.toLowerCase())
+
+        const [inviter, spillover] = await Promise.all([
+          userModel.findUserByAddress(reqBody?.invitedBy?.toLowerCase()),
+          userModel.findUserByAddress(reqBody?.spillover?.toLowerCase())
+        ])
         if (!inviter) {
           throw new ApiError(StatusCodes.BAD_REQUEST, 'Không tồn tại địa chỉ ví người mời')
         }
 
+        //Nếu có người thừa hưởng ( spillover )
+        const source = spillover ?? inviter
+        const inviterChain = [
+          ...(source?.spillover ? [source?.spillover] : []),
+          ...(source?.inviterChain ?? []).slice(0, 8)
+        ]
+
         // Tạo user mới
         const createdUser = await userModel.createUser({
           address: address.toLowerCase(),
-          invitedBy: inviter.address.toLowerCase(),
+          invitedBy: inviter?.address.toLowerCase(),
           refreshToken: null,
-          inviterChain: [
-            ...(inviter.invitedBy ? [inviter.invitedBy] : []),
-            ...((inviter.inviterChain || []).slice(0, 8))
-          ]
+          spillover: spillover?.address.toLowerCase() ?? inviter?.address.toLowerCase(),
+          inviterChain
         })
 
         await Promise.all([

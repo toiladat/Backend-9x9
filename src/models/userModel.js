@@ -23,6 +23,10 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     Joi.string().pattern(ADDRESS_RULE).trim().strict(),
     Joi.valid(null)
   ),
+  spillover: Joi.alternatives().try(
+    Joi.string().pattern(ADDRESS_RULE).trim().strict(),
+    Joi.valid(null)
+  ),
   inviterChain: Joi.array().items(Joi.string().pattern(ADDRESS_RULE)).max(9).default([]),
   directedAmount: Joi.number().min(0).default(0),
   referralChainAmount: Joi.number().min(0).default(0),

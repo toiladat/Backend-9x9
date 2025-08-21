@@ -21,6 +21,7 @@ const validTransactionApprove = async (req, res, next) => {
     )
     if (!targetLog) throw new ApiError(StatusCodes.BAD_REQUEST, 'Contract USDT không khớp')
     const addressParseLog = '0x'+ targetLog.topics[1].slice(26)
+
     if ( addressParseLog.toLocaleLowerCase() !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
 
     const formatReceipt = {

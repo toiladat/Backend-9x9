@@ -16,7 +16,7 @@ const approve = async (transaction) => {
     const distributedUser = await userModel.findDistributedUser(user.inviterChain[boxNumber - 1], boxNumber)
     // 5 U
     const referalChain = [
-      user.invitedBy,
+      user.spillover, // Người thừa hưởng || người mời
       ...user.inviterChain.slice(0, 8).map(address => address)
     ]
 

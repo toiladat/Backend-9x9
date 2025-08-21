@@ -77,6 +77,9 @@ Route.route('/nonce/:address')
  *               invitedBy:
  *                 type: string
  *                 example: "0xd01498c3178d75ee69271ea62ad13e8c523e8038"
+ *               spillover:
+ *                 type: string
+ *                 example: "0xbbda7e8d75876d3ef593ae8771c018aa618840f9"
  *     responses:
  *       200:
  *         description: Đăng nhập thành công, trả về access token

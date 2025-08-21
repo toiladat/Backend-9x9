@@ -11,6 +11,7 @@ import ApiError from '~/utils/ApiError'
 const approve = async (req, res, next) => {
   try {
     const transaction = req.transaction
+    console.log('🚀 ~ boxController.js:14 ~ approve ~ transaction:', transaction)
     const result = await boxService.approve(transaction)
     const { addresses, amounts } = extractAddressesAndAmounts(result)
     const encoded = ethers.AbiCoder.defaultAbiCoder().encode(
@@ -56,7 +57,7 @@ const getTree = async (req, res, next) => {
     const address = req.query.address|| req.decoded.address
     const user = await userModel.findUserByAddress(address)
     if (!user) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ không tồn tại')
-    const filter = { invitedBy: address, _destroy: false }
+    const filter = { spillover: address, _destroy: false }
     const options = { projection: { address: 1 } }
     const result = await userService.getUsers(req.pagination, filter, options)
     res.status(StatusCodes.OK).json({

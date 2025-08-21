@@ -59,6 +59,9 @@ const login = async (req, res, next) => {
     }),
     invitedBy:Joi.string().optional().pattern(ADDRESS_RULE).trim().strict().messages({
       'string.pattern.base':'Địa chỉ ví người mời không hợp lệ'
+    }),
+    spillover: Joi.string().optional().pattern(ADDRESS_RULE).trim().strict().messages({
+      'string.pattern.base':'Địa chỉ ví người mời không hợp lệ'
     })
   }).strict()
   try {
