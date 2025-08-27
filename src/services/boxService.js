@@ -12,15 +12,17 @@ const approve = async (transaction) => {
     const box = user.openBoxHistories.find(history => history.open == false)
     if (box.boxNumber!=boxNumber)
       throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
-    // 10 U phân phối
+    // 10 U số 2 ( up line )
     const distributedUser = await userModel.findDistributedUser(user.inviterChain[boxNumber - 1], boxNumber)
-    // 5 U
+    // 5 U chia 9 người
     const referalChain = [
       user.spillover, // Người thừa hưởng || người mời
       ...user.inviterChain.slice(0, 8).map(address => address)
     ]
 
     //check xem có đủ điều kiện nhận không
+
+    // 10 U số 1 ( trực tiếp )
     const validInviter = await userModel.filterValidReferalAddress( [user?.invitedBy], boxNumber)
     const validReferalChain = await userModel.filterValidReferalAddress(referalChain, boxNumber)
 

@@ -11,7 +11,6 @@ import ApiError from '~/utils/ApiError'
 const approve = async (req, res, next) => {
   try {
     const transaction = req.transaction
-    console.log('🚀 ~ boxController.js:14 ~ approve ~ transaction:', transaction)
     const result = await boxService.approve(transaction)
     const { addresses, amounts } = extractAddressesAndAmounts(result)
     const encoded = ethers.AbiCoder.defaultAbiCoder().encode(
@@ -24,7 +23,7 @@ const approve = async (req, res, next) => {
     res.status(StatusCodes.OK).json({
       signature,
       addresses,
-      amounts
+      amounts: amounts.map(a => a.toString())
     })
 
   } catch (error) { next(error)}

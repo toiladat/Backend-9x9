@@ -1,7 +1,7 @@
-import { ethers } from 'ethers'
+import { getAddress, parseUnits } from 'ethers'
 import { DIRECTED_AMOUNT_TYPE, DISTRIBUTED_AMOUNT_TYPE, REFERRAL_CHAIN_AMOUNT_TYPE, SYSTEM_AMOUNT_TYPE } from './constants'
 
-export const formatParsedLog = (parsedLog, decimals = 6) => {
+export const formatParsedLog = (parsedLog, decimals = 18) => {
 
   const addresses = parsedLog.args[2]
   const amounts = parsedLog.args[3]
@@ -26,26 +26,33 @@ export const formatParsedLog = (parsedLog, decimals = 6) => {
   }
 }
 
-export const extractAddressesAndAmounts= (obj) => {
+export const extractAddressesAndAmounts = (obj) => {
   const addresses = []
   const amounts = []
 
-  const handleEntry = (entry) => {
-    if (entry?.address && typeof entry.amount === 'number') {
-      addresses.push(ethers.getAddress(entry.address))
-      amounts.push(entry.amount * 1e6)
+  const toWei = (amt) => {
+    if (typeof amt === 'bigint') return amt// đã là wei
+    if (typeof amt === 'number') return parseUnits(String(amt), 18) // số ETH -> wei (bigint)
+    if (typeof amt === 'string') {
+      // '2.5' => parseUnits; '1000000000000000000' (không dấu '.') => coi như wei
+      return amt.includes('.') ? parseInt(amt, 18) : BigInt(amt)
     }
-  }
-  for (const key in obj) {
-    const value = obj[key]
-    if (Array.isArray(value)) {
-      value.forEach(item => handleEntry(item))
-    } else if (typeof value === 'object') {
-      handleEntry(value)
-    }
+    throw new Error('Invalid amount type')
   }
 
-  return { addresses, amounts }
+  const handleEntry = (entry) => {
+    if (!entry || !entry.address || entry.amount == null) return
+    addresses.push(getAddress(entry.address)) // checksum
+    amounts.push(toWei(entry.amount))
+  }
+
+  for (const key in obj) {
+    const value = obj[key]
+    if (Array.isArray(value)) value.forEach(handleEntry)
+    else if (value && typeof value === 'object') handleEntry(value)
+  }
+
+  return { addresses, amounts } // amounts là mảng bigint, hợp với uint256[]
 }
 
 export const formatAddress = (address, end) => `${address?.slice(0, end)}...${address?.slice(-3)}`

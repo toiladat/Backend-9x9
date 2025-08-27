@@ -26,7 +26,7 @@ const validTransactionApprove = async (req, res, next) => {
 
     const formatReceipt = {
       address,
-      amount: Number(ethers.formatUnits(targetLog.data, 6)),
+      amount: Number(ethers.formatUnits(targetLog.data, 18)),
       boxNumber: boxNumber
     }
     if (formatReceipt.amount < OPEN_BOX_AMOUNT) throw new ApiError(StatusCodes.BAD_REQUEST, 'Số tiền Approve không đủ')
@@ -55,7 +55,8 @@ const validTransactionOpenBox = async (req, res, next) => {
     const parsedLog = iface.parseLog(targetLog)
 
     if ( parsedLog.args[0].toLowerCase() !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
-    req.transaction = formatParsedLog(parsedLog, 6)
+    req.transaction = formatParsedLog(parsedLog, 18)
+
     next()
   } catch (error) {
     next(error) }
