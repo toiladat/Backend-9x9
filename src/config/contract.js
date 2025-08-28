@@ -10,10 +10,10 @@ let signer = null
 let provider = null
 export const CONNECT_CONTRACT = async () => {
   try {
-    provider = new ethers.JsonRpcProvider(process.env.RPC_ALCHEMY_URL)
+    provider = new ethers.JsonRpcProvider('https://bnb-mainnet.g.alchemy.com/v2/FJVO6TUmIb5ytV398zp5qww6BOJfB8mK')
 
     contractRead = new ethers.Contract(
-      process.env.CONTRACT_ADDRESS,
+      '0xA8a96BCc4e9f8423555a5F16C67D2562a1D328B5',
       contractABI,
       provider
     )
