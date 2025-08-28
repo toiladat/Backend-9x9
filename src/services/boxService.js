@@ -60,7 +60,7 @@ const openBox = async ( transaction) => {
 
     const box = user.openBoxHistories.find(history => history.open == false)
     if (box.boxNumber!=boxNumber)
-      throw new ApiError(StatusCodes.BAD_REQUEST, 'Số Box mở không phù hợp')
+      throw new ApiError(StatusCodes.CONFLICT, 'Số Box mở không phù hợp')
     const updatedUser = await userModel.openBox(opener, boxNumber)
 
     const receivers = rewards.filter(reward => reward.address != process.env.SYSTEM_ADDRESS)
