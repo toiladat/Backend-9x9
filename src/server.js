@@ -13,7 +13,10 @@ import { CONNECT_CONTRACT } from './config/contract'
 import cookieParser from 'cookie-parser'
 
 dotenv.config()
-
+console.log(process.env.CONTRACT_ADDRESS);
+console.log(process.env.RPC_ALCHEMY_URL);
+console.log(process.env.CONTRACT_MUSDT_ADDRESS);
+console.log(process.env.SYSTEM_ADDRESS);
 const START_SERVER = () => {
 
   const app = express()
