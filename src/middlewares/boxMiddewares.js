@@ -15,9 +15,9 @@ const validTransactionApprove = async (req, res, next) => {
     const { provider } = await GET_CONTRACT()
     const receipt = await provider.getTransactionReceipt(txHash)
     if ( receipt?.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
-    const contractAddress = '0x55d398326f99059fF775485246999027B3197955'
+    const contractUsdtAddress = process.env.CONTRACT_MUSDT_ADDRESS
     const targetLog = receipt.logs.find(
-      log => log.address.toLowerCase() === contractAddress.toLowerCase()
+      log => log.address.toLowerCase() === contractUsdtAddress.toLowerCase()
     )
     if (!targetLog) throw new ApiError(StatusCodes.BAD_REQUEST, 'Contract USDT không khớp')
     const addressParseLog = '0x'+ targetLog.topics[1].slice(26)
@@ -46,7 +46,7 @@ const validTransactionOpenBox = async (req, res, next) => {
     const iface = new ethers.Interface(contractABI)
 
     if ( receipt.status != 1) { throw new ApiError(StatusCodes.BAD_REQUEST, 'Giao dịch chưa hoàn thành') }
-    const contractAddress = '0xA8a96BCc4e9f8423555a5F16C67D2562a1D328B5'
+    const contractAddress = process.env.CONTRACT_ADDRESS
     const targetLog = receipt.logs.find(
       log => log.address.toLowerCase() === contractAddress.toLowerCase()
     )
