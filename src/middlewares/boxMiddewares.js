@@ -55,8 +55,19 @@ const validTransactionOpenBox = async (req, res, next) => {
     const parsedLog = iface.parseLog(targetLog)
 
     if ( parsedLog.args[0].toLowerCase() !== address.toLowerCase()) throw new ApiError(StatusCodes.BAD_REQUEST, 'Địa chỉ ví không khớp với mã giao dịch')
-    req.transaction = formatParsedLog(parsedLog, 18)
 
+    //Lấy emit BoxOpened do txHash trả 2 emit
+    const ev = iface.getEvent('BoxOpened')
+    const sig = ev.format('sighash')
+    const topic0 = ethers.id(sig)
+
+    const boxLogs = receipt.logs.filter(
+      l => l.address.toLowerCase() === contractAddress.toLowerCase()
+        && l.topics[0] === topic0
+    )
+    const parsed = iface.parseLog(boxLogs[0])
+
+    req.transaction = formatParsedLog(parsed, 18)
     next()
   } catch (error) {
     next(error) }

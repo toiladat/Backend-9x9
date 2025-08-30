@@ -44,7 +44,7 @@ export const contractABI = [
     inputs: [
       { indexed: true, internalType: 'address', name: 'user', type: 'address' },
       {
-        indexed: false,
+        indexed: true,
         internalType: 'uint8',
         name: 'boxNumber',
         type: 'uint8',
