@@ -13,6 +13,7 @@ import { CONNECT_CONTRACT } from './config/contract'
 import cookieParser from 'cookie-parser'
 
 dotenv.config()
+
 const START_SERVER = () => {
 
   const app = express()
@@ -53,10 +54,6 @@ const START_SERVER = () => {
     await CONNECT_DB()
     await CONNECT_CONTRACT()
     console.log('Connectd to MongoDB Cloud Atlas')
-    console.log(process.env.CONTRACT_ADDRESS);
-console.log(process.env.RPC_ALCHEMY_URL);
-console.log(process.env.CONTRACT_MUSDT_ADDRESS);
-console.log(process.env.SYSTEM_ADDRESS);
     START_SERVER()
   } catch (error) {
     console.log(error)

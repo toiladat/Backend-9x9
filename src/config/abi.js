@@ -42,6 +42,20 @@ export const contractABI = [
   {
     anonymous: false,
     inputs: [
+      { indexed: true, internalType: 'address', name: 'user', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint8',
+        name: 'boxNumber',
+        type: 'uint8',
+      },
+    ],
+    name: 'BoxOpenedByUser',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
       {
         indexed: true,
         internalType: 'address',
