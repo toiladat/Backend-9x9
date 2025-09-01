@@ -151,9 +151,9 @@ export const REWARD_DAYS = [
   { day: 30, score: 999 }
 ]
 export const REWARDS_MISSSIONS = {
-  shareLink: 99,
-  joinGroup: 99,
-  readTerms: 99
+  shareLink: 999,
+  joinGroup: 999,
+  readTerms: 999
 }
 export const REWARDS_MINING = 99
 
