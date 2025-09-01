@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { userModel } from '~/models/userModel'
 import ApiError from '~/utils/ApiError'
-import { DIRECTED_AMOUNT_VALUE, DISTRIBUTE_PER_USER, REFERRAL_CHAIN_AMOUNT_VALUE, DISTRIBUTED_AMOUNT_VALUE, SYSTEM_AMOUNT_VALUE, DESC_BOX } from '~/utils/constants'
+import { DIRECTED_AMOUNT_VALUE, DISTRIBUTE_PER_USER, REFERRAL_CHAIN_AMOUNT_VALUE, DISTRIBUTED_AMOUNT_VALUE, SYSTEM_AMOUNT_VALUE, DESC_BOX, SYSTEM_AMOUNT_TYPE } from '~/utils/constants'
 
 const approve = async (transaction) => {
   try {
@@ -59,11 +59,11 @@ const openBox = async ( transaction) => {
     const user = await userModel.findUserByAddress(opener)
 
     const box = user.openBoxHistories.find(history => history.open == false)
-    if (box.boxNumber!=boxNumber)
+    if (box?.boxNumber!=boxNumber)
       throw new ApiError(StatusCodes.CONFLICT, 'Số Box mở không phù hợp')
     const updatedUser = await userModel.openBox(opener, boxNumber)
 
-    const receivers = rewards.filter(reward => reward.address != process.env.SYSTEM_ADDRESS)
+    const receivers = rewards.filter(reward => reward.type != SYSTEM_AMOUNT_TYPE)
     await userModel.distributeAmounts(receivers)
     return updatedUser
   } catch (error) { throw error }
