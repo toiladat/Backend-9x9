@@ -13,7 +13,9 @@ export const calculateNumerology = (dob, fullName) => {
   const personalityMonth = reduce(month) // tháng sinh
   const bodyYear = reduce(year.toString().split('').reduce((a, b) => a + +b, 0)) // năm sinh
 
-  const lifePath = reduce(soulDay + personalityMonth + bodyYear) // đường đời
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const lifePath = reduce(soulDay + personalityMonth + currentYear) // đường đời
 
   const allDigits = dob.replaceAll('/', '').split('').map(Number)
   const mainNumber = reduce(allDigits.reduce((a, b) => a + b, 0)) // số chính

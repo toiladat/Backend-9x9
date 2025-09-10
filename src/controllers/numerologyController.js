@@ -1,4 +1,3 @@
-import { userService } from '~/services/userService'
 import { StatusCodes } from 'http-status-codes'
 import { numerologymodel } from '~/models/numerologyModel'
 import { calculateNumerology } from '~/utils/caculateDob'
@@ -8,10 +7,6 @@ const numerology = async (req, res, next) => {
   try {
     const { birth, name } = req.query
     const number = calculateNumerology(birth, name)
-    await userService.updateUserByAddress({
-      address: req.decoded.address,
-      mainNumber: number.mainNumber
-    })
     const meaning = await numerologymodel.getMeanings(number.mainNumber)
     return res.status(StatusCodes.OK).json({
       name,

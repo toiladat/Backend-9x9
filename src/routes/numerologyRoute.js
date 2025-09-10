@@ -1,11 +1,9 @@
-import { authMiddlewares } from '~/middlewares/authMiddlewares'
 import { userValidation } from '~/validations/userValidation'
 import { Router } from 'express'
 import { numerologyController } from '~/controllers/numerologyController'
 
 
 const Route = Router()
-Route.use(authMiddlewares.auth)
 
 /**
  * @swagger
@@ -80,6 +78,6 @@ Route.use(authMiddlewares.auth)
  *         description: Lỗi server
  */
 Route.route('/meanings')
-  .get(authMiddlewares.isKyc, userValidation.numerology, numerologyController.numerology)
+  .get(userValidation.numerology, numerologyController.numerology)
 
 export const numerologyRoute = Route
