@@ -79,40 +79,112 @@ export const EMAIL_HTML = (otpKyc) => `
 `
 export const DESC_BOX = [
   {
-    title: 'Sao thức tỉnh',
-    content: 'Trải nghiệm đầu tiên, gắp sao nhận thông điệp thức tỉnh.'
+    title: {
+      vi: 'Sao thức tỉnh',
+      en: 'Awakening Star',
+      zh: '觉醒之星'
+    },
+    content: {
+      vi: 'Trải nghiệm đầu tiên, gắp sao nhận thông điệp thức tỉnh.',
+      en: 'The first experience – draw a star and receive your awakening message.',
+      zh: '第一次体验——抽取星星，接收觉醒讯息。'
+    }
   },
   {
-    title: 'Sao gieo hạt',
-    content: 'Giới thiệu StarBox cho người thân – tạo điểm chạm đầu tiên.'
+    title: {
+      vi: 'Sao gieo hạt',
+      en: 'Seed Star',
+      zh: '播种之星'
+    },
+    content: {
+      vi: 'Giới thiệu StarBox cho người thân – tạo điểm chạm đầu tiên.',
+      en: 'Introduce StarBox to loved ones – create the first meaningful touchpoint.',
+      zh: '向亲友介绍 StarBox——创造第一次连结的种子。'
+    }
   },
   {
-    title: 'Sao mở lòng',
-    content: 'Nhận tín hiệu từ bên trong, bước vào hành trình khai sáng.'
+    title: {
+      vi: 'Sao mở lòng',
+      en: 'Opening Star',
+      zh: '敞开心扉之星'
+    },
+    content: {
+      vi: 'Nhận tín hiệu từ bên trong, bước vào hành trình khai sáng.',
+      en: 'Receive inner signals and step into the journey of illumination.',
+      zh: '接受内在讯号，踏上启蒙之旅。'
+    }
   },
   {
-    title: 'Sao kết nối',
-    content: 'Kết nối những người đồng hành, cùng học hỏi – chữa lành.'
+    title: {
+      vi: 'Sao kết nối',
+      en: 'Connection Star',
+      zh: '连接之星'
+    },
+    content: {
+      vi: 'Kết nối những người đồng hành, cùng học hỏi – chữa lành.',
+      en: 'Connect with companions, learn together – and heal.',
+      zh: '连接同行者，共同学习与疗愈。'
+    }
   },
   {
-    title: 'Sao phản chiếu',
-    content: 'Đối diện thử thách – nhìn sâu vào bóng tối bên trong.'
+    title: {
+      vi: 'Sao phản chiếu',
+      en: 'Reflection Star',
+      zh: '映照之星'
+    },
+    content: {
+      vi: 'Đối diện thử thách – nhìn sâu vào bóng tối bên trong.',
+      en: 'Face your challenges – look deeply into your inner shadows.',
+      zh: '直面挑战——深入看见内在的阴影。'
+    }
   },
   {
-    title: 'Sao dẫn lối',
-    content: 'Trở thành người chia sẻ, truyền cảm hứng cho nhóm nhỏ.'
+    title: {
+      vi: 'Sao dẫn lối',
+      en: 'Guiding Star',
+      zh: '引路之星'
+    },
+    content: {
+      vi: 'Trở thành người chia sẻ, truyền cảm hứng cho nhóm nhỏ.',
+      en: 'Become a sharer and inspire a small group.',
+      zh: '成为分享者，激励你的小组。'
+    }
   },
   {
-    title: 'Sao khai sáng',
-    content: 'Hiểu rõ sứ mệnh, bắt đầu xây hệ thống cộng hưởng.'
+    title: {
+      vi: 'Sao khai sáng',
+      en: 'Enlightening Star',
+      zh: '启发之星'
+    },
+    content: {
+      vi: 'Hiểu rõ sứ mệnh, bắt đầu xây hệ thống cộng hưởng.',
+      en: 'Understand your mission and begin building a resonant system.',
+      zh: '明确使命，开始建立共振体系。'
+    }
   },
   {
-    title: 'Sao rộng mở',
-    content: 'Lan tỏa mạnh mẽ – hỗ trợ người khác cùng thức tỉnh.'
+    title: {
+      vi: 'Sao rộng mở',
+      en: 'Expanding Star',
+      zh: '扩展之星'
+    },
+    content: {
+      vi: 'Lan tỏa mạnh mẽ – hỗ trợ người khác cùng thức tỉnh.',
+      en: 'Expand your influence – support others on their awakening journey.',
+      zh: '强力扩散——支持他人共同觉醒。'
+    }
   },
   {
-    title: 'Sao kiến tạo',
-    content: 'Trở thành Nhà kiến tạo – đồng hành cùng 9x9 phát triển dài lâu.'
+    title: {
+      vi: 'Sao kiến tạo',
+      en: 'Creator Star',
+      zh: '创造者之星'
+    },
+    content: {
+      vi: 'Trở thành Nhà kiến tạo – đồng hành cùng 9x9 phát triển dài lâu.',
+      en: 'Become a Creator – journey with 9x9 for long-term evolution.',
+      zh: '成为创造者——与 9x9 共创长期发展。'
+    }
   }
 ]
 

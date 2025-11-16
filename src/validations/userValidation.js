@@ -114,8 +114,8 @@ const numerology = async (req, res, next) => {
     name:Joi.string().required().trim().strict().messages({
       'any.required': 'Họ tên là bắt buộc',
       'string.empty': 'Vui lòng nhập họ tên'
-
-    })
+    }),
+    language:Joi.string().optional().trim()
   }).strict()
 
   try {

@@ -72,7 +72,7 @@ const getMe = async (address) => {
     const openBoxHistories = safeUser.openBoxHistories.map((history, idx) => ({
       ...history,
       description: DESC_BOX[idx],
-      title: `Hộp ${idx + 1}`
+      title: `${idx + 1}`
     }))
 
     const [

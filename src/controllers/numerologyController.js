@@ -5,9 +5,10 @@ import { calculateNumerology } from '~/utils/caculateDob'
 //[GET]/numerology/numerology
 const numerology = async (req, res, next) => {
   try {
-    const { birth, name } = req.query
+    const { birth, name, language } = req.query
     const number = calculateNumerology(birth, name)
-    const meaning = await numerologymodel.getMeanings(number.mainNumber)
+    const meaningRes = await numerologymodel.getMeanings(number.mainNumber)
+    const meaning = meaningRes.translation[`${language || 'en'}`]
     return res.status(StatusCodes.OK).json({
       name,
       number,

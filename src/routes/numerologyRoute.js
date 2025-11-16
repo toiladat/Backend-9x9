@@ -25,6 +25,12 @@ const Route = Router()
  *         schema:
  *           type: string
  *           example: "02/09/2012"
+ *       - in: query
+ *         name: language
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: "en"
  *     responses:
  *       200:
  *         description: Trả về số và ý nghĩa con số
